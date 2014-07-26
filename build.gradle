@@ -1,0 +1,19 @@
+apply plugin: 'java'
+version = '0.0.2-topobyte' 
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compile group: 'org.slf4j-api', name: 'slf4j-api', version: '1.6.1'
+    runtime group: 'org.slf4j-log4j', name: 'slf4j-log4j12', version: '1.6.1'
+    runtime group: 'org.apache.log4j', name: 'log4j'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}

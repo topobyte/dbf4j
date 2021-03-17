@@ -97,7 +97,7 @@ public abstract class Index
 	public Index()
 	{
 		key_definition = new byte[488];
-		keyControl = new Vector<Field>();
+		keyControl = new Vector<>();
 		dosname = new String("");
 		activeKey = null;
 

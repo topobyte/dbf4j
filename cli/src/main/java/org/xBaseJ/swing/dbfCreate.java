@@ -368,7 +368,7 @@ public class dbfCreate extends JFrame
 
 	public void setUpColumnModel()
 	{
-		JComboBox jcb = new JComboBox();
+		JComboBox<String> jcb = new JComboBox<>();
 		jcb.addItem("Char");
 		jcb.addItem("Date");
 		jcb.addItem("Float");
@@ -463,12 +463,12 @@ class dbfCreateModel extends AbstractTableModel
 
 	public dbfCreateModel(DBF dbf) throws xBaseJException
 	{
-		name = new Vector<String>();
-		type = new Vector<String>();
-		length = new Vector<String>();
-		decPos = new Vector<String>();
-		indexInd = new Vector<Boolean>();
-		indexName = new Vector<String>();
+		name = new Vector<>();
+		type = new Vector<>();
+		length = new Vector<>();
+		decPos = new Vector<>();
+		indexInd = new Vector<>();
+		indexName = new Vector<>();
 		Field f;
 		for (int i = 1; i <= dbf.getFieldCount(); i++) {
 			f = dbf.getField(i);
@@ -513,12 +513,12 @@ class dbfCreateModel extends AbstractTableModel
 	public dbfCreateModel()
 	{
 		rowCount = 1;
-		name = new Vector<String>();
-		type = new Vector<String>();
-		length = new Vector<String>();
-		decPos = new Vector<String>();
-		indexInd = new Vector<Boolean>();
-		indexName = new Vector<String>();
+		name = new Vector<>();
+		type = new Vector<>();
+		length = new Vector<>();
+		decPos = new Vector<>();
+		indexInd = new Vector<>();
+		indexName = new Vector<>();
 
 		name.addElement("");
 		type.addElement("Char");

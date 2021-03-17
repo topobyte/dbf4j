@@ -204,7 +204,7 @@ public class dbfShow extends Frame implements ActionListener, WindowListener,
 		viewPane.setLayout(gb);
 
 		int i, j;
-		fldObjects = new Vector<Component>(db.getFieldCount());
+		fldObjects = new Vector<>(db.getFieldCount());
 		for (i = 1; i <= db.getFieldCount(); i++) {
 			j = i - 1;
 			f = db.getField(i);

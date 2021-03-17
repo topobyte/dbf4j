@@ -961,7 +961,7 @@ class dbfViewerRecordPanel extends JPanel implements ActionListener
 
 		int i;
 		if (tableModel.getColumnCount() > 0) {
-			fldObjects = new Vector<Component>(tableModel.getColumnCount() - 1);
+			fldObjects = new Vector<>(tableModel.getColumnCount() - 1);
 			Field f;
 			for (i = 0; i < tableModel.getColumnCount() - 1; i++) {
 

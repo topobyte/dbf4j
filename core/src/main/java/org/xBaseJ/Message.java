@@ -48,8 +48,8 @@ public class Message extends Object
 
 	public Message()
 	{
-		idVector = new Vector<String>();
-		dataVector = new Vector<String>();
+		idVector = new Vector<>();
+		dataVector = new Vector<>();
 	}
 
 	/**
@@ -93,8 +93,8 @@ public class Message extends Object
 
 		InStream.readFully(DataIn, 0, dataLen);
 
-		idVector = new Vector<String>();
-		dataVector = new Vector<String>();
+		idVector = new Vector<>();
+		dataVector = new Vector<>();
 
 		for (i = 0; i < dataLen;) {
 			for (j = i; j < dataLen && DataIn[j] != 0; j++) {

@@ -2,40 +2,107 @@ wrapper {
     gradleVersion = '5.2.1'
 }
 
-group = pGroup
-version = pVersion
-
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-
-if (project.hasProperty("topobyte")) {
-    apply from: 'file:///' + System.getProperty("user.home") \
-        + '/.gradle/topobyte.gradle'
+allprojects {
+    group = pGroup
+    version = pVersion
 }
 
-task listJars {
-    doLast {
-        configurations.compile.each { File file -> println file.name }
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    repositories {
+        maven {
+            url 'https://mvn.topobyte.de'
+        }
+        mavenCentral()
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+ext.libraries = [
+    project(':dbf4j'),
+]
+
+configure(libraries) {
+
+    apply plugin: 'maven'
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourcesJar
+    }
+
+    def runForArtifactPublication = project.hasProperty("topobyte")
+
+    if (runForArtifactPublication) {
+        apply from: 'file:///' + System.getProperty("user.home") \
+            + '/.gradle/topobyte.gradle'
+    }
+
+    def global = new File(rootProject.projectDir, 'info.pom');
+    def local = new File(project.projectDir, 'info.pom');
+
+    def pomInfo = new XmlSlurper().parse(global);
+    def projName = pomInfo.name
+    def projDesc = pomInfo.description
+    if (local.exists()) {
+        def pomInfoL = new XmlSlurper().parse(local);
+        projName = pomInfoL.name
+        projDesc = pomInfoL.description
+    }
+
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    pom.project {
+                        name projName
+                        description projDesc
+                        url pomInfo.url
+                        licenses {
+                            license {
+                                name pomInfo.licenseName
+                                url pomInfo.licenseUrl
+                                distribution pomInfo.licenseDistribution
+                            }
+                        }
+                    }
+                    pom.whenConfigured {
+                        p -> p.dependencies = p.dependencies.findAll {
+                            dep -> dep.scope != "test"
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-repositories {
-    mavenCentral()
+project(':dbf4j') {
+    eclipse.project.name = 'dbf4j-core'
+    dependencies {
+        compile "org.slf4j:slf4j-api:1.6.1"
+        runtime "org.slf4j:slf4j-log4j12:1.6.1"
+        runtime "log4j:log4j:1.2.16"
+        testCompile "junit:junit:4.+"
+    }
 }
 
-dependencies {
-    compile "org.slf4j:slf4j-api:1.6.1"
-    runtime "org.slf4j:slf4j-log4j12:1.6.1"
-    runtime "log4j:log4j:1.2.16"
-    testCompile "junit:junit:4.+"
+project(':dbf4j-examples') {
+    dependencies {
+        compile project(':dbf4j')
+    }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives sourcesJar
+project(':dbf4j-cli') {
+    dependencies {
+        compile project(':dbf4j')
+    }
 }

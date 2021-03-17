@@ -1,1 +1,4 @@
-rootProject.name = pName
+include 'core', 'cli', 'examples'
+project(':core').name = 'dbf4j'
+project(':cli').name = 'dbf4j-cli'
+project(':examples').name = 'dbf4j-examples'

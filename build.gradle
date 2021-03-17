@@ -9,8 +9,15 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-task listJars << {
-    configurations.compile.each { File file -> println file.name }
+if (project.hasProperty("topobyte")) {
+    apply from: 'file:///' + System.getProperty("user.home") \
+        + '/.gradle/topobyte.gradle'
+}
+
+task listJars {
+    doLast {
+        configurations.compile.each { File file -> println file.name }
+    }
 }
 
 repositories {
@@ -22,16 +29,6 @@ dependencies {
     runtime "org.slf4j:slf4j-log4j12:1.6.1"
     runtime "log4j:log4j:1.2.16"
     testCompile "junit:junit:4.+"
-}
-
-if (project.hasProperty("topobyte")) {
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: maven_url_topobyte)
-            }
-        }
-    }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

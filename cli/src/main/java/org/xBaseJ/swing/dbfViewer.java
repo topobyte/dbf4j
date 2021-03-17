@@ -612,9 +612,8 @@ public class dbfViewer extends JFrame implements ActionListener, WindowListener,
 
 	}
 
-	public static void main(String[] args)
+	public static void main(String name, String[] args)
 	{
-
 		dbfViewer frame;
 
 		if (args.length == 0) {

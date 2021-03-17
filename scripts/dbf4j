@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DIR=`dirname $0`
+
+exec $DIR/dbf4j.sh org.xBaseJ.Cli "$@"

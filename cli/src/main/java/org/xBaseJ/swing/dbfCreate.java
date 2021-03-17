@@ -382,9 +382,8 @@ public class dbfCreate extends JFrame
 
 	}
 
-	public static void main(String[] args)
+	public static void main(String name, String[] args)
 	{
-
 		dbfCreate frame;
 
 		frame = new dbfCreate();

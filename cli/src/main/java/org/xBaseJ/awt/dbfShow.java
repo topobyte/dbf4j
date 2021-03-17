@@ -594,9 +594,8 @@ public class dbfShow extends Frame implements ActionListener, WindowListener,
 
 	}
 
-	public static void main(String[] args) throws Exception
+	public static void main(String name, String[] args) throws Exception
 	{
-
 		if (args.length == 0) {
 			new dbfShow("dbfShow", null);
 		} else {

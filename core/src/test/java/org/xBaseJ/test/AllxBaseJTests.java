@@ -38,7 +38,6 @@ public class AllxBaseJTests {
 		suite.addTestSuite(TestPack.class);
 		suite.addTestSuite(TestConcurrInsert.class);
 		suite.addTestSuite(TestIndexAfterAdding.class);
-		suite.addTestSuite(TestXMLParser.class);
 		suite.addTestSuite(TestDatePutCalendar.class);
 		return suite;
 	}

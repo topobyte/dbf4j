@@ -1,4 +1,5 @@
 package org.xBaseJ.awt;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -36,18 +37,27 @@ import javax.swing.filechooser.FileFilter;
 public class dbfFileFilter extends FileFilter
 {
 
-  public dbfFileFilter() {}
+	public dbfFileFilter()
+	{
+	}
 
-  public String getDescription() {return "dBase and FoxPro DBF files";}
+	@Override
+	public String getDescription()
+	{
+		return "dBase and FoxPro DBF files";
+	}
 
-  public boolean accept(File f) {
-    if (f.isDirectory()) return true;
+	@Override
+	public boolean accept(File f)
+	{
+		if (f.isDirectory()) {
+			return true;
+		}
 
-    String name = f.getName().toUpperCase();
+		String name = f.getName().toUpperCase();
 
-    return name.endsWith(".DBF");
+		return name.endsWith(".DBF");
 
-  }
+	}
 
 }
-

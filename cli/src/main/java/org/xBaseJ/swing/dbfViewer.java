@@ -1,4 +1,5 @@
 package org.xBaseJ.swing;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -94,1163 +95,1284 @@ import org.xBaseJ.awt.dbfFileFilter;
 import org.xBaseJ.fields.Field;
 import org.xBaseJ.fields.MemoField;
 
-
-public class dbfViewer extends JFrame implements ActionListener, WindowListener, ListSelectionListener, DocumentListener, Printable
+public class dbfViewer extends JFrame implements ActionListener, WindowListener,
+		ListSelectionListener, DocumentListener, Printable
 
 {
 
-    /**
+	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private boolean startEnabled = false;
 
-    int editingRow = -1;
+	int editingRow = -1;
 
-    Vector<String> names;
-    String fname = null;
+	Vector<String> names;
+	String fname = null;
 
-    JTable table;
-    JMenuBar menuBar;
-    JMenu menuFile, menuView, menuSearch;
-    JMenuItem menuPrint;
-    JMenuItem menuSave;
-    JMenuItem menuOpen;
-    JMenuItem menuExit;
-    JMenuItem horizontalView;
-    JMenuItem startFind, findNext, findPrev;
+	JTable table;
+	JMenuBar menuBar;
+	JMenu menuFile, menuView, menuSearch;
+	JMenuItem menuPrint;
+	JMenuItem menuSave;
+	JMenuItem menuOpen;
+	JMenuItem menuExit;
+	JMenuItem horizontalView;
+	JMenuItem startFind, findNext, findPrev;
 
-    JSplitPane splitPane;
-    JScrollPane tableScrollPane, recordScrollPane;
+	JSplitPane splitPane;
+	JScrollPane tableScrollPane, recordScrollPane;
 
+	dbfTableModel tableModel;
+	dbfViewerRecordPanel dbfrp = null;
+	private String lastDirectory = "./.";
 
-    dbfTableModel tableModel;
-    dbfViewerRecordPanel dbfrp = null;
-    private String lastDirectory = "./.";
+	private String searchText = "";
+	private boolean searchFields[] = null;
 
-    private String searchText = "";
-    private boolean searchFields[] = null;
+	private int orient = JSplitPane.HORIZONTAL_SPLIT;
 
-    private int orient = JSplitPane.HORIZONTAL_SPLIT;
-    
-    boolean fileChanged = false;
+	boolean fileChanged = false;
 
-    public dbfViewer(String arg) {
+	public dbfViewer(String arg)
+	{
 
-        fname = arg;
+		fname = arg;
 
-        menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
 
-        menuFile = new JMenu("File");
-        menuBar.add(menuFile);
-        menuOpen = new JMenuItem("Open..");
-        menuOpen.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
-        menuPrint = new JMenuItem("Print");
-        menuPrint.setEnabled(startEnabled);
-        menuPrint.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
-        menuSave = new JMenuItem("Save..");
-        menuSave.setEnabled(startEnabled);
-        menuSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        menuExit = new JMenuItem("Exit..");
-        menuSave.setEnabled(startEnabled);
-        menuSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
-        menuFile.add(menuOpen);
-        menuFile.add(menuPrint);
-        menuFile.add(menuSave);
-        menuFile.addSeparator();
-        menuFile.add(menuExit);
-        menuView = new JMenu("View");
-        menuBar.add(menuView);
-        horizontalView = new JMenuItem("Vertical");
-        menuView.add(horizontalView);
-        menuSearch = new JMenu("Search");
-        menuBar.add(menuSearch);
-        startFind = new JMenuItem("Find");
-        startFind.setEnabled(startEnabled);
-        startFind.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-        findNext = new JMenuItem("Find Next");
-        findNext.setEnabled(false);
-        findNext.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.getKeyText(KeyEvent.VK_F3)));
-        findPrev = new JMenuItem("Find Prev");
-        findPrev.setEnabled(false);
-        findPrev.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F3, ActionEvent.SHIFT_MASK));
-        menuSearch.add(startFind);
-        menuSearch.add(findNext);
-        menuSearch.add(findPrev);
+		menuFile = new JMenu("File");
+		menuBar.add(menuFile);
+		menuOpen = new JMenuItem("Open..");
+		menuOpen.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
+		menuPrint = new JMenuItem("Print");
+		menuPrint.setEnabled(startEnabled);
+		menuPrint.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.ALT_MASK));
+		menuSave = new JMenuItem("Save..");
+		menuSave.setEnabled(startEnabled);
+		menuSave.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+		menuExit = new JMenuItem("Exit..");
+		menuSave.setEnabled(startEnabled);
+		menuSave.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
+		menuFile.add(menuOpen);
+		menuFile.add(menuPrint);
+		menuFile.add(menuSave);
+		menuFile.addSeparator();
+		menuFile.add(menuExit);
+		menuView = new JMenu("View");
+		menuBar.add(menuView);
+		horizontalView = new JMenuItem("Vertical");
+		menuView.add(horizontalView);
+		menuSearch = new JMenu("Search");
+		menuBar.add(menuSearch);
+		startFind = new JMenuItem("Find");
+		startFind.setEnabled(startEnabled);
+		startFind.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+		findNext = new JMenuItem("Find Next");
+		findNext.setEnabled(false);
+		findNext.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.getKeyText(KeyEvent.VK_F3)));
+		findPrev = new JMenuItem("Find Prev");
+		findPrev.setEnabled(false);
+		findPrev.setAccelerator(
+				KeyStroke.getKeyStroke(KeyEvent.VK_F3, ActionEvent.SHIFT_MASK));
+		menuSearch.add(startFind);
+		menuSearch.add(findNext);
+		menuSearch.add(findPrev);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
+		menuOpen.addActionListener(this);
+		menuPrint.addActionListener(this);
+		menuSave.addActionListener(this);
+		menuExit.addActionListener(this);
+		startFind.addActionListener(this);
 
-        menuOpen.addActionListener(this);
-        menuPrint.addActionListener(this);
-        menuSave.addActionListener(this);
-        menuExit.addActionListener(this);
-        startFind.addActionListener(this);
+		findNext.addActionListener(this);
+		findPrev.addActionListener(this);
+		horizontalView.addActionListener(this);
+		addWindowListener(this);
 
-        findNext.addActionListener(this);
-        findPrev.addActionListener(this);
-        horizontalView.addActionListener(this);
-        addWindowListener(this);
+		if (arg == null) {
+			tableModel = new dbfTableModel();
+			setTitle("org.xBaseJ Version: " + DBF.xBaseJVersion);
+		} else {
 
-        if (arg == null) {
-           tableModel = new dbfTableModel();
-           setTitle("org.xBaseJ Version: "+ DBF.xBaseJVersion);
-        }
-        else {
+			tableModel = new dbfTableModel(arg, this);
+			File fil = new File(arg);
+			lastDirectory = fil.getPath();
+			setTitle("org.xBaseJ Version: " + DBF.xBaseJVersion + " " + arg);
+			startEnabled = true;
+			tableSetUpToGo();
+		}
 
-           tableModel = new dbfTableModel(arg, this);
-           File fil = new File(arg);
-           lastDirectory = fil.getPath();
-           setTitle("org.xBaseJ Version: "+ DBF.xBaseJVersion + " " + arg);
-           startEnabled = true;
-           tableSetUpToGo();
-        }
-
-
-
-
-    }
-
-    public void tableSetUpToGo() {
-                table = new JTable(tableModel);
-                table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-                table.getSelectionModel().addListSelectionListener(this);
-                tableScrollPane = new JScrollPane(table);
-
-                try{dbfrp = new dbfViewerRecordPanel(this, tableModel);}
-                catch (Exception e) {
-					e.printStackTrace();
-					System.exit(0);
-					}
-                dbfrp.goTo(1);
-
-    		    menuPrint.setEnabled(true);
-    		    menuSave.setEnabled(true);
-    		    startFind.setEnabled(true);
-    		    findNext.setEnabled(false);
-    		    findPrev.setEnabled(false);
-
-    	    	recordScrollPane = new JScrollPane(dbfrp);
-    	     	Dimension min = new Dimension(200,150);
-    	    	tableScrollPane.setMinimumSize(min);
-                recordScrollPane.setMinimumSize(min);
-
-                splitPane = new JSplitPane(orient,
-                                      tableScrollPane, recordScrollPane);
-
-            	min = new Dimension(400,300);
-         		splitPane.setMinimumSize(min);
-                getContentPane().add(splitPane);
-                splitPane.setDividerLocation(200);
-                table.revalidate();
-                table.repaint();
-                validate();
-                editingRow = 0;
-
-                this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 	}
-    public void actionPerformed(ActionEvent ae) {
 
-       if (ae.getSource() == menuOpen)
-          {
-    	   
-    	   		if (fileChangedTestDontContinue()) {
-    	   			return;
-    	   		}
-                JFileChooser jfc = new JFileChooser(new File(lastDirectory +"/*.dbf"));
-                jfc.addChoosableFileFilter(new dbfFileFilter());
-                jfc.showOpenDialog(this);
-                File fil = jfc.getSelectedFile();
-                if (fil == null)
-                    return;
+	public void tableSetUpToGo()
+	{
+		table = new JTable(tableModel);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		table.getSelectionModel().addListSelectionListener(this);
+		tableScrollPane = new JScrollPane(table);
 
-                this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+		try {
+			dbfrp = new dbfViewerRecordPanel(this, tableModel);
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(0);
+		}
+		dbfrp.goTo(1);
 
-                lastDirectory = fil.getPath();
-                fname = fil.getAbsolutePath();
-                orient = splitPane.getOrientation();
-                getContentPane().remove(splitPane);
+		menuPrint.setEnabled(true);
+		menuSave.setEnabled(true);
+		startFind.setEnabled(true);
+		findNext.setEnabled(false);
+		findPrev.setEnabled(false);
 
-                setTitle(fname);
+		recordScrollPane = new JScrollPane(dbfrp);
+		Dimension min = new Dimension(200, 150);
+		tableScrollPane.setMinimumSize(min);
+		recordScrollPane.setMinimumSize(min);
 
-                tableModel = new dbfTableModel(fname, this);
+		splitPane = new JSplitPane(orient, tableScrollPane, recordScrollPane);
 
-                tableSetUpToGo();
+		min = new Dimension(400, 300);
+		splitPane.setMinimumSize(min);
+		getContentPane().add(splitPane);
+		splitPane.setDividerLocation(200);
+		table.revalidate();
+		table.repaint();
+		validate();
+		editingRow = 0;
 
-                fileChanged = false;
-                return;
-           }
+		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	}
 
-       if (ae.getSource() == menuPrint)
-         {
-              PrinterJob pj=PrinterJob.getPrinterJob();
+	@Override
+	public void actionPerformed(ActionEvent ae)
+	{
 
-              pj.setPrintable(dbfViewer.this);
-              pj.printDialog();
+		if (ae.getSource() == menuOpen) {
 
-                try{
-                    pj.print();
-                }catch (Exception PrintException) {
-					PrintException.printStackTrace();}
+			if (fileChangedTestDontContinue()) {
+				return;
+			}
+			JFileChooser jfc = new JFileChooser(
+					new File(lastDirectory + "/*.dbf"));
+			jfc.addChoosableFileFilter(new dbfFileFilter());
+			jfc.showOpenDialog(this);
+			File fil = jfc.getSelectedFile();
+			if (fil == null) {
+				return;
+			}
 
-              return;
-         }
+			this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
-       if (ae.getSource() == menuSave) {
-           this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-           TableCellEditor editor = table.getCellEditor();
-           if (editor != null)
-              editor.stopCellEditing();
-           tableModel.save();
-           this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           fileChanged = false;
-       }
-       
-       if (ae.getSource() == menuExit)
-       {
+			lastDirectory = fil.getPath();
+			fname = fil.getAbsolutePath();
+			orient = splitPane.getOrientation();
+			getContentPane().remove(splitPane);
 
-	   		if (fileChangedTestDontContinue()) {
-	   			return;
-	   		}
-	   		
-            System.exit(0);
-        }
+			setTitle(fname);
 
+			tableModel = new dbfTableModel(fname, this);
 
-       if (ae.getSource() == horizontalView) {
-		   if (horizontalView.getText().compareTo("Vertical") == 0) {
-                splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
-                horizontalView.setText("Horizontal");
-	         }
-           else  {
-                splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
-                horizontalView.setText("Vertical");
-		     }
-	       splitPane.resetToPreferredSizes();
-	       this.pack();
-       }
+			tableSetUpToGo();
 
+			fileChanged = false;
+			return;
+		}
 
-      if (ae.getSource() == startFind) {
-		   if (searchFields == null)
-		      {
-				  searchFields = new boolean[tableModel.getColumnCount()-1];
-			  }
+		if (ae.getSource() == menuPrint) {
+			PrinterJob pj = PrinterJob.getPrinterJob();
 
-		   new dbfViewerSearchDialog(this, tableModel, searchText, searchFields).setVisible(true);
-	   }
+			pj.setPrintable(dbfViewer.this);
+			pj.printDialog();
 
-      if (ae.getSource() == findNext) {
+			try {
+				pj.print();
+			} catch (Exception PrintException) {
+				PrintException.printStackTrace();
+			}
 
-	    String colText;
+			return;
+		}
 
-	    int row = table.getEditingRow()+1;
+		if (ae.getSource() == menuSave) {
+			this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			TableCellEditor editor = table.getCellEditor();
+			if (editor != null) {
+				editor.stopCellEditing();
+			}
+			tableModel.save();
+			this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			fileChanged = false;
+		}
 
+		if (ae.getSource() == menuExit) {
 
-	    outRow: for (; row < tableModel.getRowCount(); row++)
-	     {
-	       for (int col=0; col < tableModel.getColumnCount()-1; col++)
-	         {
+			if (fileChangedTestDontContinue()) {
+				return;
+			}
 
+			System.exit(0);
+		}
 
-				if (searchFields[col] == false)
-				  continue;
+		if (ae.getSource() == horizontalView) {
+			if (horizontalView.getText().compareTo("Vertical") == 0) {
+				splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+				horizontalView.setText("Horizontal");
+			} else {
+				splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+				horizontalView.setText("Vertical");
+			}
+			splitPane.resetToPreferredSizes();
+			this.pack();
+		}
 
-	            colText = (String) tableModel.getValueAt(row,col);
-	            if (colText.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-	              {
-	               table.setRowSelectionInterval( row, row);
-                   table.scrollRectToVisible(table.getCellRect(row, col, false));
-	               table.setEditingRow(row);
-	               editingRow = row;
-	               break outRow;
-			   }
-		   }
-	    }
-	    if (editingRow != row)
-	      Toolkit.getDefaultToolkit().beep();
+		if (ae.getSource() == startFind) {
+			if (searchFields == null) {
+				searchFields = new boolean[tableModel.getColumnCount() - 1];
+			}
 
-	   }
+			new dbfViewerSearchDialog(this, tableModel, searchText,
+					searchFields).setVisible(true);
+		}
 
-      if (ae.getSource() == findPrev) {
+		if (ae.getSource() == findNext) {
 
-	    String colText;
+			String colText;
 
-	    int row = table.getEditingRow()-1;
+			int row = table.getEditingRow() + 1;
 
-	    outRow: for (; row >  -1; row--)
-	     {
-	       for (int col=0; col < tableModel.getColumnCount()-1; col++)
-	         {
-				if (searchFields[col] == false)
-				  continue;
+			outRow: for (; row < tableModel.getRowCount(); row++) {
+				for (int col = 0; col < tableModel.getColumnCount()
+						- 1; col++) {
 
-	            colText = (String) tableModel.getValueAt(row,col);
-	            if (colText.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-	              {
-	               table.setRowSelectionInterval( row, row);
-                   table.scrollRectToVisible(table.getCellRect(row, col, false));
-	               table.setEditingRow( row);
-	               editingRow = row;
-	               break outRow;
-			   }
-		   }
-	    }
-	    if (editingRow != row)
-	      Toolkit.getDefaultToolkit().beep();
+					if (searchFields[col] == false) {
+						continue;
+					}
 
-	   }
+					colText = (String) tableModel.getValueAt(row, col);
+					if (colText.toUpperCase()
+							.indexOf(searchText.toUpperCase()) > -1) {
+						table.setRowSelectionInterval(row, row);
+						table.scrollRectToVisible(
+								table.getCellRect(row, col, false));
+						table.setEditingRow(row);
+						editingRow = row;
+						break outRow;
+					}
+				}
+			}
+			if (editingRow != row) {
+				Toolkit.getDefaultToolkit().beep();
+			}
 
+		}
 
+		if (ae.getSource() == findPrev) {
 
-      this.repaint();
+			String colText;
 
-  }
+			int row = table.getEditingRow() - 1;
 
-    private boolean fileChangedTestDontContinue() {
-		if (fileChanged == false)
+			outRow: for (; row > -1; row--) {
+				for (int col = 0; col < tableModel.getColumnCount()
+						- 1; col++) {
+					if (searchFields[col] == false) {
+						continue;
+					}
+
+					colText = (String) tableModel.getValueAt(row, col);
+					if (colText.toUpperCase()
+							.indexOf(searchText.toUpperCase()) > -1) {
+						table.setRowSelectionInterval(row, row);
+						table.scrollRectToVisible(
+								table.getCellRect(row, col, false));
+						table.setEditingRow(row);
+						editingRow = row;
+						break outRow;
+					}
+				}
+			}
+			if (editingRow != row) {
+				Toolkit.getDefaultToolkit().beep();
+			}
+
+		}
+
+		this.repaint();
+
+	}
+
+	private boolean fileChangedTestDontContinue()
+	{
+		if (fileChanged == false) {
 			return false;
-		
+		}
+
 		int dialogButton = JOptionPane.OK_CANCEL_OPTION;
-		
-		return JOptionPane.showConfirmDialog(null, "Data has changed. Ok to continue. Cancel to return.", "Confirm", dialogButton) == JOptionPane.CANCEL_OPTION;
-		
+
+		return JOptionPane.showConfirmDialog(null,
+				"Data has changed. Ok to continue. Cancel to return.",
+				"Confirm", dialogButton) == JOptionPane.CANCEL_OPTION;
+
 	}
 
 	JTableHeader tableHeader;
-    int [] subTableSplit = null;
-    boolean pageinfoCalculated=false;
-    int totalNumPages=0;
-    int prevPageIndex = 0;
-    int subPageIndex = 0;
-    int subTableSplitSize = 0;
-    double tableHeightOnFullPage, headerHeight;
-    double pageWidth, pageHeight;
-    int fontHeight, fontDesent;
-    double tableHeight, rowHeight;
+	int[] subTableSplit = null;
+	boolean pageinfoCalculated = false;
+	int totalNumPages = 0;
+	int prevPageIndex = 0;
+	int subPageIndex = 0;
+	int subTableSplitSize = 0;
+	double tableHeightOnFullPage, headerHeight;
+	double pageWidth, pageHeight;
+	int fontHeight, fontDesent;
+	double tableHeight, rowHeight;
 
-   public int print(Graphics g, PageFormat pageFormat, int pageIndex) throws PrinterException {
+	@Override
+	public int print(Graphics g, PageFormat pageFormat, int pageIndex)
+			throws PrinterException
+	{
 
-        Graphics2D g2=(Graphics2D)g;
-        if(!pageinfoCalculated) {
-                getPageInfo(g, pageFormat);
-        }
-
-        g2.setColor(Color.black);
-        if(pageIndex>=totalNumPages) {
-                return Printable.NO_SUCH_PAGE;
-        }
-        if (prevPageIndex != pageIndex) {
-                subPageIndex++;
-                if( subPageIndex == subTableSplitSize -1) {
-                        subPageIndex=0;
-                }
-        }
-
-        g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-
-        int rowIndex = pageIndex/ (subTableSplitSize -1);
-
-        printTablePart(g2, pageFormat, rowIndex, subPageIndex);
-        prevPageIndex= pageIndex;
-        return Printable.PAGE_EXISTS;
-        }
-
-
- public void getPageInfo(Graphics g, PageFormat pageFormat) {
-
-        subTableSplit = null;
-        subTableSplitSize = 0;
-        subPageIndex = 0;
-        prevPageIndex = 0;
-
-        fontHeight=g.getFontMetrics().getHeight();
-        fontDesent=g.getFontMetrics().getDescent();
-
-        tableHeader = table.getTableHeader();
-
-        headerHeight = tableHeader.getHeight() + table.getRowMargin();
-
-        pageHeight = pageFormat.getImageableHeight();
-        pageWidth =  pageFormat.getImageableWidth();
-
-
-        tableHeight = table.getSize().getHeight();
-        rowHeight = table.getRowHeight() + table.getRowMargin();
-
-        tableHeightOnFullPage = (int)(pageHeight - headerHeight - fontHeight*2);
-        tableHeightOnFullPage = tableHeightOnFullPage/rowHeight * rowHeight;
-
-        TableColumnModel tableColumnModel = tableHeader.getColumnModel();
-        int columns = tableColumnModel.getColumnCount();
-        int columnMargin = tableColumnModel.getColumnMargin();
-
-        int [] temp = new int[columns];
-        int columnIndex = 0;
-        temp[0] = 0;
-        int columnWidth;
-        int length = 0;
-        subTableSplitSize = 0;
-        while ( columnIndex < columns ) {
-
-           columnWidth = tableColumnModel.getColumn(columnIndex).getWidth();
-
-           if ( length + columnWidth + columnMargin > pageWidth ) {
-              temp[subTableSplitSize+1] = temp[subTableSplitSize] + length;
-              length = columnWidth;
-              subTableSplitSize++;
-            }
-            else {
-               length += columnWidth + columnMargin;
-            }
-            columnIndex++;
-        } //while
-
-        if ( length > 0 )  {  // if are more columns left, part page
-           temp[subTableSplitSize+1] = temp[subTableSplitSize] + length;
-           subTableSplitSize++;
-        }
-
-        subTableSplitSize++;
-        subTableSplit = new int[subTableSplitSize];
-        for ( int i=0; i < subTableSplitSize; i++ ) {
-           subTableSplit[i]= temp[i];
-        }
-        totalNumPages = (int)(tableHeight/tableHeightOnFullPage);
-        if ( tableHeight%tableHeightOnFullPage >= rowHeight ) { // at least 1 more row left
-            totalNumPages++;
-        }
-
-        totalNumPages *= (subTableSplitSize-1);
-        pageinfoCalculated = true;
-    }
-
-    public void printTablePart(Graphics2D g2, PageFormat pageFormat, int rowIndex, int columnIndex) {
-
-        String pageNumber = "Page: "+(rowIndex+1);
-        if ( subTableSplitSize > 1 ) {
-                pageNumber += "-" + (columnIndex+1);
-        }
-
-        int pageLeft = subTableSplit[columnIndex];
-        int pageRight = subTableSplit[columnIndex + 1];
-
-        int pageWidth =  pageRight-pageLeft;
-        // page number message
-        g2.drawString(pageNumber,  pageWidth/2-35, (int)(pageHeight - fontHeight));
-
-        double clipHeight = Math.min(tableHeightOnFullPage, tableHeight - rowIndex*tableHeightOnFullPage);
-
-        g2.translate(-subTableSplit[columnIndex], 0);
-        g2.setClip(pageLeft ,0, pageWidth, (int)headerHeight);
-
-        tableHeader.paint(g2);   // draw the header on every page
-        g2.translate(0, headerHeight);
-        g2.translate(0,  -tableHeightOnFullPage*rowIndex);
-
-        // cut table image and draw on the page
-
-        g2.setClip(pageLeft, (int)tableHeightOnFullPage*rowIndex, pageWidth, (int)clipHeight);
-        table.paint(g2);
-
-        double pageTop =  tableHeightOnFullPage*rowIndex - headerHeight;
-        g2.drawRect(pageLeft, (int)pageTop, pageWidth, (int)(clipHeight+ headerHeight));
-    }
-
-
- public void searchSet(String inText, boolean[] inFields)
- {
-    searchText = inText;
-    searchFields = inFields;
-
-    String colText;
-
-    int row = table.getEditingRow();
-    if (row < 0) row = 1;
-
-    for (; row < tableModel.getRowCount(); row++)
-     {
-       for (int col=0; col < tableModel.getColumnCount()-1; col++)
-         {
-			if (searchFields[col] == false)
-			  continue;
-
-            colText = (String) tableModel.getValueAt(row,col);
-            if (colText.toUpperCase().indexOf(searchText.toUpperCase()) > -1)
-              {
-               table.setRowSelectionInterval( row, row);
-               editingRow = row;
-               table.scrollRectToVisible(table.getCellRect(row, col, false));
-               table.setEditingRow(row);
-               findNext.setEnabled(true);
-               findPrev.setEnabled(true);
-               return;
-		   }
-	   }
-   }
-   Toolkit.getDefaultToolkit().beep();
-
- }
-
-
- public static void main(String[] args) {
-
-        dbfViewer frame;
-
-        if (args.length == 0) frame = new dbfViewer(null);
-        else  frame = new dbfViewer(args[0]);
-
-        frame.setSize(888, 1111);
-        frame.setVisible(true);
-    }
-
-
- public void windowClosing(WindowEvent we) {
-			System.exit(0);
+		Graphics2D g2 = (Graphics2D) g;
+		if (!pageinfoCalculated) {
+			getPageInfo(g, pageFormat);
 		}
- public void windowOpened(java.awt.event.WindowEvent we) {}
- public void windowClosed(java.awt.event.WindowEvent we) {System.exit(0);}
- public void windowIconified(java.awt.event.WindowEvent we) {}
- public void windowDeiconified(java.awt.event.WindowEvent we) {}
- public void windowActivated(java.awt.event.WindowEvent we) {}
- public void windowDeactivated(java.awt.event.WindowEvent we) {}
 
- public void valueChanged(ListSelectionEvent e) {
-	 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-	 if (lsm.isSelectionEmpty()) ;
-	 else
-	 {
-	    dbfrp.goTo(lsm.getMinSelectionIndex()+1);
-	    editingRow = lsm.getMinSelectionIndex();
+		g2.setColor(Color.black);
+		if (pageIndex >= totalNumPages) {
+			return Printable.NO_SUCH_PAGE;
+		}
+		if (prevPageIndex != pageIndex) {
+			subPageIndex++;
+			if (subPageIndex == subTableSplitSize - 1) {
+				subPageIndex = 0;
+			}
+		}
+
+		g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+
+		int rowIndex = pageIndex / (subTableSplitSize - 1);
+
+		printTablePart(g2, pageFormat, rowIndex, subPageIndex);
+		prevPageIndex = pageIndex;
+		return Printable.PAGE_EXISTS;
 	}
- }
 
+	public void getPageInfo(Graphics g, PageFormat pageFormat)
+	{
 
- public void changedUpdate(DocumentEvent de)
- {
- }
- public void insertUpdate(DocumentEvent de) { updateTable(de); }
- public void removeUpdate(DocumentEvent de) { updateTable(de); }
+		subTableSplit = null;
+		subTableSplitSize = 0;
+		subPageIndex = 0;
+		prevPageIndex = 0;
 
+		fontHeight = g.getFontMetrics().getHeight();
+		fontDesent = g.getFontMetrics().getDescent();
 
- public void updateTable(DocumentEvent de)
- {
-	 Document doc = (Document) de.getDocument();
-	 int col = Integer.parseInt((String) doc.getProperty("name"));
-	 int len = doc.getLength();
-	 if (editingRow == -1)
-	    editingRow = 0;
-	 try {
-    	 String text = doc.getText(0,len);
-         tableModel.setValueAt(text, editingRow, col);
-         tableModel.fireTableCellUpdated(editingRow, col);
+		tableHeader = table.getTableHeader();
+
+		headerHeight = tableHeader.getHeight() + table.getRowMargin();
+
+		pageHeight = pageFormat.getImageableHeight();
+		pageWidth = pageFormat.getImageableWidth();
+
+		tableHeight = table.getSize().getHeight();
+		rowHeight = table.getRowHeight() + table.getRowMargin();
+
+		tableHeightOnFullPage = (int) (pageHeight - headerHeight
+				- fontHeight * 2);
+		tableHeightOnFullPage = tableHeightOnFullPage / rowHeight * rowHeight;
+
+		TableColumnModel tableColumnModel = tableHeader.getColumnModel();
+		int columns = tableColumnModel.getColumnCount();
+		int columnMargin = tableColumnModel.getColumnMargin();
+
+		int[] temp = new int[columns];
+		int columnIndex = 0;
+		temp[0] = 0;
+		int columnWidth;
+		int length = 0;
+		subTableSplitSize = 0;
+		while (columnIndex < columns) {
+
+			columnWidth = tableColumnModel.getColumn(columnIndex).getWidth();
+
+			if (length + columnWidth + columnMargin > pageWidth) {
+				temp[subTableSplitSize + 1] = temp[subTableSplitSize] + length;
+				length = columnWidth;
+				subTableSplitSize++;
+			} else {
+				length += columnWidth + columnMargin;
+			}
+			columnIndex++;
+		} // while
+
+		if (length > 0) { // if are more columns left, part page
+			temp[subTableSplitSize + 1] = temp[subTableSplitSize] + length;
+			subTableSplitSize++;
 		}
-	catch (javax.swing.text.BadLocationException ble)
-	  	{
-		  ble.printStackTrace();
+
+		subTableSplitSize++;
+		subTableSplit = new int[subTableSplitSize];
+		for (int i = 0; i < subTableSplitSize; i++) {
+			subTableSplit[i] = temp[i];
 		}
- }
+		totalNumPages = (int) (tableHeight / tableHeightOnFullPage);
+		if (tableHeight % tableHeightOnFullPage >= rowHeight) { // at least 1
+																// more row left
+			totalNumPages++;
+		}
+
+		totalNumPages *= (subTableSplitSize - 1);
+		pageinfoCalculated = true;
+	}
+
+	public void printTablePart(Graphics2D g2, PageFormat pageFormat,
+			int rowIndex, int columnIndex)
+	{
+
+		String pageNumber = "Page: " + (rowIndex + 1);
+		if (subTableSplitSize > 1) {
+			pageNumber += "-" + (columnIndex + 1);
+		}
+
+		int pageLeft = subTableSplit[columnIndex];
+		int pageRight = subTableSplit[columnIndex + 1];
+
+		int pageWidth = pageRight - pageLeft;
+		// page number message
+		g2.drawString(pageNumber, pageWidth / 2 - 35,
+				(int) (pageHeight - fontHeight));
+
+		double clipHeight = Math.min(tableHeightOnFullPage,
+				tableHeight - rowIndex * tableHeightOnFullPage);
+
+		g2.translate(-subTableSplit[columnIndex], 0);
+		g2.setClip(pageLeft, 0, pageWidth, (int) headerHeight);
+
+		tableHeader.paint(g2); // draw the header on every page
+		g2.translate(0, headerHeight);
+		g2.translate(0, -tableHeightOnFullPage * rowIndex);
+
+		// cut table image and draw on the page
+
+		g2.setClip(pageLeft, (int) tableHeightOnFullPage * rowIndex, pageWidth,
+				(int) clipHeight);
+		table.paint(g2);
+
+		double pageTop = tableHeightOnFullPage * rowIndex - headerHeight;
+		g2.drawRect(pageLeft, (int) pageTop, pageWidth,
+				(int) (clipHeight + headerHeight));
+	}
+
+	public void searchSet(String inText, boolean[] inFields)
+	{
+		searchText = inText;
+		searchFields = inFields;
+
+		String colText;
+
+		int row = table.getEditingRow();
+		if (row < 0) {
+			row = 1;
+		}
+
+		for (; row < tableModel.getRowCount(); row++) {
+			for (int col = 0; col < tableModel.getColumnCount() - 1; col++) {
+				if (searchFields[col] == false) {
+					continue;
+				}
+
+				colText = (String) tableModel.getValueAt(row, col);
+				if (colText.toUpperCase()
+						.indexOf(searchText.toUpperCase()) > -1) {
+					table.setRowSelectionInterval(row, row);
+					editingRow = row;
+					table.scrollRectToVisible(
+							table.getCellRect(row, col, false));
+					table.setEditingRow(row);
+					findNext.setEnabled(true);
+					findPrev.setEnabled(true);
+					return;
+				}
+			}
+		}
+		Toolkit.getDefaultToolkit().beep();
+
+	}
+
+	public static void main(String[] args)
+	{
+
+		dbfViewer frame;
+
+		if (args.length == 0) {
+			frame = new dbfViewer(null);
+		} else {
+			frame = new dbfViewer(args[0]);
+		}
+
+		frame.setSize(888, 1111);
+		frame.setVisible(true);
+	}
+
+	@Override
+	public void windowClosing(WindowEvent we)
+	{
+		System.exit(0);
+	}
+
+	@Override
+	public void windowOpened(java.awt.event.WindowEvent we)
+	{
+	}
+
+	@Override
+	public void windowClosed(java.awt.event.WindowEvent we)
+	{
+		System.exit(0);
+	}
+
+	@Override
+	public void windowIconified(java.awt.event.WindowEvent we)
+	{
+	}
+
+	@Override
+	public void windowDeiconified(java.awt.event.WindowEvent we)
+	{
+	}
+
+	@Override
+	public void windowActivated(java.awt.event.WindowEvent we)
+	{
+	}
+
+	@Override
+	public void windowDeactivated(java.awt.event.WindowEvent we)
+	{
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e)
+	{
+		ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		if (lsm.isSelectionEmpty()) {
+			;
+		} else {
+			dbfrp.goTo(lsm.getMinSelectionIndex() + 1);
+			editingRow = lsm.getMinSelectionIndex();
+		}
+	}
+
+	@Override
+	public void changedUpdate(DocumentEvent de)
+	{
+	}
+
+	@Override
+	public void insertUpdate(DocumentEvent de)
+	{
+		updateTable(de);
+	}
+
+	@Override
+	public void removeUpdate(DocumentEvent de)
+	{
+		updateTable(de);
+	}
+
+	public void updateTable(DocumentEvent de)
+	{
+		Document doc = de.getDocument();
+		int col = Integer.parseInt((String) doc.getProperty("name"));
+		int len = doc.getLength();
+		if (editingRow == -1) {
+			editingRow = 0;
+		}
+		try {
+			String text = doc.getText(0, len);
+			tableModel.setValueAt(text, editingRow, col);
+			tableModel.fireTableCellUpdated(editingRow, col);
+		} catch (javax.swing.text.BadLocationException ble) {
+			ble.printStackTrace();
+		}
+	}
 
 }
 
-
 class dbfTableModel extends AbstractTableModel
-    {
-     /**
-	 *
-	 */
+{
+	/**
+	*
+	*/
 	private static final long serialVersionUID = 1L;
 	DBF currentDBF;
-     int inRow;
-     String columnName[];
-     int columnCount;
-     int rowCount;
-     DateFormat df;
-     Object fld[][];
-     Boolean deleted[];
-     dbfViewer parent;
+	int inRow;
+	String columnName[];
+	int columnCount;
+	int rowCount;
+	DateFormat df;
+	Object fld[][];
+	Boolean deleted[];
+	dbfViewer parent;
 
-    public dbfTableModel(String tableName, dbfViewer inParent)
-      {
-       try {
-        currentDBF = new DBF(tableName);
-        df = DateFormat.getDateInstance(DateFormat.SHORT);
-        parent = inParent;
-        getData();
-       }
-       catch( Exception e ) {
-		   e.printStackTrace();
-		   }
-      }
+	public dbfTableModel(String tableName, dbfViewer inParent)
+	{
+		try {
+			currentDBF = new DBF(tableName);
+			df = DateFormat.getDateInstance(DateFormat.SHORT);
+			parent = inParent;
+			getData();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public dbfTableModel()
-      {
-          columnCount = 0;
-          rowCount = 0;
-      }
-    public void save()
-      {
-        String inString = "not set yet";
-        try {
-        for (int r = 0; r < rowCount; r++)
-        {
-          currentDBF.gotoRecord(r+1);
-          for (int k = 0; k < columnCount-1; k++)
-             {
-		      inString = "Field " + k;
-		      if (fld[r][k] instanceof String)
-                  currentDBF.getField(k+1).put((String)fld[r][k]);
-              else
-		      if (fld[r][k] instanceof Boolean)
-		        { Boolean bf = (Boolean) fld[r][k];
-                  currentDBF.getField(k+1).put(bf.booleanValue()?"T":"F");
-			    }
-             }
-          Boolean b = deleted[r];
-          if (b.booleanValue())
-              currentDBF.delete();
-          else
-              currentDBF.undelete();
-          currentDBF.update();
-          } // for each record
-         
-        } // try
-        catch (Exception e) {
-			  e.printStackTrace();
-              JOptionPane.showMessageDialog(parent, inString + " caused an exception: " + e.getMessage(), "Error Setting Field" , JOptionPane.ERROR_MESSAGE);
-         }
-      }
+	public dbfTableModel()
+	{
+		columnCount = 0;
+		rowCount = 0;
+	}
 
-    public  String getColumnName(int c) {
-		return columnName[c];}
+	public void save()
+	{
+		String inString = "not set yet";
+		try {
+			for (int r = 0; r < rowCount; r++) {
+				currentDBF.gotoRecord(r + 1);
+				for (int k = 0; k < columnCount - 1; k++) {
+					inString = "Field " + k;
+					if (fld[r][k] instanceof String) {
+						currentDBF.getField(k + 1).put((String) fld[r][k]);
+					} else if (fld[r][k] instanceof Boolean) {
+						Boolean bf = (Boolean) fld[r][k];
+						currentDBF.getField(k + 1)
+								.put(bf.booleanValue() ? "T" : "F");
+					}
+				}
+				Boolean b = deleted[r];
+				if (b.booleanValue()) {
+					currentDBF.delete();
+				} else {
+					currentDBF.undelete();
+				}
+				currentDBF.update();
+			} // for each record
 
-    public  void setValueAt(Object in, int r, int  c)
-          {
-    	
-    	 
+		} // try
+		catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(parent,
+					inString + " caused an exception: " + e.getMessage(),
+					"Error Setting Field", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
-            if (c==columnCount-1) {
-               deleted[r] = (Boolean) in;
-               return;
-              }
+	@Override
+	public String getColumnName(int c)
+	{
+		return columnName[c];
+	}
 
+	@Override
+	public void setValueAt(Object in, int r, int c)
+	{
 
-             try {
+		if (c == columnCount - 1) {
+			deleted[r] = (Boolean) in;
+			return;
+		}
 
-                if (currentDBF.getField(c+1).getType() == 'L')
-                    fld[r][c] = (Boolean) in;
-                else
-                    fld[r][c] = (String) in;
-                }
+		try {
 
-                /*catch (java.text.ParseException pe) {pe.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, inString + " is not the correct format for date fields.", "Invalid Date Field", JOptionPane.ERROR_MESSAGE);
-                }
-                catch (java.lang.NumberFormatException nfe) {nfe.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, inString + " is not the correct format for numeric fields.", "Invalid Floating Numeric Field", JOptionPane.ERROR_MESSAGE);
-                }
-                */
-                catch (Exception e) {e.printStackTrace();
-                    JOptionPane.showMessageDialog(parent, "row: " + r + " col: " + c + " " + in + " caused an exception: " + e.getMessage(), "Error Setting Field", JOptionPane.ERROR_MESSAGE);
-                }
-           }
-
-     public  Object getValueAt(int r, int  c)
-          {
-            if (c == columnCount-1)
-             {
-              return deleted[r];
-		    }
-
-            return fld[r][c];
-           }
-
-
-   @SuppressWarnings({ "unchecked", "rawtypes" })
-public Class getColumnClass(int c){
-	   return getValueAt(0,c).getClass();
-	   }
-
-   public Field getColumnField(int c) throws Exception {return currentDBF.getField(c+1);}
-
-   public  int getRowCount() { return rowCount; }
-
-   public  int getColumnCount() { return columnCount; }
-
-   public boolean isCellEditable(int r, int c) {return false;}
-
-
-   public  void getData() throws Exception
-      {
-        int r, k;
-        rowCount = currentDBF.getRecordCount();
-        columnCount = currentDBF.getFieldCount()+ 1;
-        columnName = new String[columnCount];
-        columnName[columnCount-1] = "Deleted";
-        for (k = 1; k< columnCount; k++)
-           {
-           columnName[k-1] = currentDBF.getField(k).getName();
-           }
-
-        deleted = new Boolean[rowCount];
-        fld = new Object[rowCount][columnCount];
-
-        try {
-        for (r = 0; r < rowCount; r++)
-        {
-          currentDBF.gotoRecord(r+1);
-          for (k = 0; k < columnCount-1; k++)
-             {
-              if (currentDBF.getField(k+1).getType() == 'L')
-                fld[r][k] = Boolean.valueOf(currentDBF.getField(k+1).get().compareTo("T")==0);
-              else
-                fld[r][k] = currentDBF.getField(k+1).get();
-             }
-          deleted[r] = Boolean.valueOf(currentDBF.deleted());
-        }
-        }
-
-        catch (Exception e1) {
-			e1.printStackTrace();
+			if (currentDBF.getField(c + 1).getType() == 'L') {
+				fld[r][c] = in;
+			} else {
+				fld[r][c] = in;
 			}
+		}
 
-      }
+		/*
+		 * catch (java.text.ParseException pe) {pe.printStackTrace();
+		 * JOptionPane.showMessageDialog(parent, inString +
+		 * " is not the correct format for date fields.", "Invalid Date Field",
+		 * JOptionPane.ERROR_MESSAGE); } catch (java.lang.NumberFormatException
+		 * nfe) {nfe.printStackTrace(); JOptionPane.showMessageDialog(parent,
+		 * inString + " is not the correct format for numeric fields.",
+		 * "Invalid Floating Numeric Field", JOptionPane.ERROR_MESSAGE); }
+		 */
+		catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(parent,
+					"row: " + r + " col: " + c + " " + in
+							+ " caused an exception: " + e.getMessage(),
+					"Error Setting Field", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	@Override
+	public Object getValueAt(int r, int c)
+	{
+		if (c == columnCount - 1) {
+			return deleted[r];
+		}
+
+		return fld[r][c];
+	}
+
+	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Class getColumnClass(int c)
+	{
+		return getValueAt(0, c).getClass();
+	}
+
+	public Field getColumnField(int c) throws Exception
+	{
+		return currentDBF.getField(c + 1);
+	}
+
+	@Override
+	public int getRowCount()
+	{
+		return rowCount;
+	}
+
+	@Override
+	public int getColumnCount()
+	{
+		return columnCount;
+	}
+
+	@Override
+	public boolean isCellEditable(int r, int c)
+	{
+		return false;
+	}
+
+	public void getData() throws Exception
+	{
+		int r, k;
+		rowCount = currentDBF.getRecordCount();
+		columnCount = currentDBF.getFieldCount() + 1;
+		columnName = new String[columnCount];
+		columnName[columnCount - 1] = "Deleted";
+		for (k = 1; k < columnCount; k++) {
+			columnName[k - 1] = currentDBF.getField(k).getName();
+		}
+
+		deleted = new Boolean[rowCount];
+		fld = new Object[rowCount][columnCount];
+
+		try {
+			for (r = 0; r < rowCount; r++) {
+				currentDBF.gotoRecord(r + 1);
+				for (k = 0; k < columnCount - 1; k++) {
+					if (currentDBF.getField(k + 1).getType() == 'L') {
+						fld[r][k] = Boolean.valueOf(currentDBF.getField(k + 1)
+								.get().compareTo("T") == 0);
+					} else {
+						fld[r][k] = currentDBF.getField(k + 1).get();
+					}
+				}
+				deleted[r] = Boolean.valueOf(currentDBF.deleted());
+			}
+		}
+
+		catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+	}
 }
 
 class dbfViewerRecordPanel extends JPanel implements ActionListener
 
-  {
+{
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	dbfViewer parent;
-    JPanel p;
-    JScrollPane sp;
-    JPanel viewPane;
-    GridBagLayout gb;
-    GridBagConstraints gbc;
-    JLabel crl, trl;
-    JCheckBox delCB;
-    JButton Prev, Next, Add,  Update, Clear;
-    Vector<Component> fldObjects;
+	JPanel p;
+	JScrollPane sp;
+	JPanel viewPane;
+	GridBagLayout gb;
+	GridBagConstraints gbc;
+	JLabel crl, trl;
+	JCheckBox delCB;
+	JButton Prev, Next, Add, Update, Clear;
+	Vector<Component> fldObjects;
 
-    JLabel l;
-    JTextField t;
-    Field f;
-    JButton b;
-    JCheckBox c;
-    int currentRow;
-    dbfTableModel tableModel;
+	JLabel l;
+	JTextField t;
+	Field f;
+	JButton b;
+	JCheckBox c;
+	int currentRow;
+	dbfTableModel tableModel;
 
+	public dbfViewerRecordPanel(dbfViewer inParent,
+			dbfTableModel indbfTableModel) throws Exception
+	{
 
+		sp = new JScrollPane(this);
+		parent = inParent;
+		tableModel = indbfTableModel;
+		setupDBFields();
+		class KeyDispatcher implements KeyEventDispatcher
+		{
 
-    public dbfViewerRecordPanel(dbfViewer inParent, dbfTableModel indbfTableModel) throws Exception
-      {
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e)
+			{
+				parent.fileChanged = true;
+				return false;
+			}
 
-         sp = new JScrollPane(this);
-         parent = inParent;
-         tableModel = indbfTableModel;
-         setupDBFields();
-     	class KeyDispatcher implements KeyEventDispatcher {
-
-     		 
-     		public boolean dispatchKeyEvent(KeyEvent e) {
-     			parent.fileChanged = true;
-     			return false;
-     		}
-         	
-         }
-         KeyDispatcher keyDispatcher = new KeyDispatcher();
-         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
-
-
-      }
-
-    public void setupDBFields()  throws Exception
-       {
-         setLayout(null);
-         Dimension dimView =  sp.getSize();
-         int height = 0, width = 50;
-         removeAll();
-
-
-         gb = new GridBagLayout();
-         gbc = new  GridBagConstraints();
-         setLayout(gb);
-
-         int i;
-         if (tableModel.getColumnCount()>0) {
-            fldObjects = new Vector<Component>(tableModel.getColumnCount()-1);
-            Field f;
-            for (i = 0; i < tableModel.getColumnCount()-1; i++)
-               {
-
-                  f = tableModel.getColumnField(i);
-                  if (f.getType() == 'M' || f.getType() == 'P' ){
-                     b = new JButton(f.getName());
-                     b.setActionCommand("M"+i);
-                     b.addActionListener(this);
-                     addComponent(this, b, 1, i, 1, 1, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST);
-                     fldObjects.addElement(b);
-                      }
-                  else if (f.getType() == 'L') {
-                     c = new JCheckBox(f.getName(), true);
-                     c.setActionCommand("L"+i);
-                     c.addActionListener(this);
-                     addComponent(this, c, 1, i, 1, 1, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST);
-                     fldObjects.addElement(c);
-                      }
-                  else {
-                     l = new JLabel(f.getName(), Label.RIGHT);
-                     addComponent(this,  l, 0, i, 1, 1, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST);
-                     int ln = f.getLength();
-                     if (ln > 100) ln = 100;
-                     t = new JTextField(f.getName(), ln);
-                     t.setName(f.getName());
-                     t.setActionCommand("T"+i);
-                     t.getDocument().addDocumentListener(parent);
-                     t.getDocument().putProperty("name", ""+i);
-                     t.setEditable(true);
-                     if (width < ln*10)
-                     	width=ln*10;
-                     addComponent(this, t, 1, i, ln, 1, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST);
-                     fldObjects.addElement(t);
-                     }
-                   height += 10;
-               }
-
-           c = new JCheckBox("Deleted");
-           c.setActionCommand("L"+i);
-           c.addActionListener(this);
-           addComponent(this, c, 1, i, 1, 1, GridBagConstraints.HORIZONTAL, GridBagConstraints.EAST);
-           fldObjects.addElement(c);
-           height += 10;
-
-	    }
-        dimView.setSize(width+150, height+150);
-        sp.setSize(dimView);
-   }
-
- public void actionPerformed(ActionEvent e) {
-	 int col = Integer.parseInt(e.getActionCommand().substring(1));
-
-
-	 switch (e.getActionCommand().charAt(0))
-	 {
-		 case 'M':
-             parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-             this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        	 new dbfTableRecordMemoDialog(parent, this, tableModel, parent.editingRow, col).setVisible(true);
-		     break;
-		 case 'L':
-		     c = (JCheckBox) fldObjects.elementAt(col);
-		     tableModel.setValueAt(Boolean.valueOf(c.isSelected()), parent.editingRow, col);
-		     tableModel.fireTableCellUpdated(parent.editingRow, col);
-		     break;
-		/* case 'T':
-		     t = (JTextField) fldObjects.elementAt(col);
-		     tableModel.setValueAt(t.getText(), parent.editingRow, col);
-		     tableModel.fireTableCellUpdated(here, col+1);
-		     break;
-
-        */
-	 }
-
- }
-
-
- public void goTo(int where)
-    {
-		parent.editingRow = where-1;
-        try {
-        if (where < 1) return;
-        if (where > tableModel.getRowCount()) return;
-
-         Field f;
-
-         JCheckBox c;
-         JTextField t;
-         int i;
-
-         for (i = 0; i < tableModel.getColumnCount()-1; i++)
-            {
-               f = tableModel.getColumnField(i);
-               if (f  instanceof MemoField) {
-                  }
-               else
-               if (f.getType() == 'L') {
-                  c  = (JCheckBox) fldObjects.elementAt(i);
-                  Boolean bln = (Boolean)tableModel.getValueAt(where-1, i);
-                  c.setSelected(bln.booleanValue());
-                  }
-               else {
-                  t = (JTextField)  fldObjects.elementAt(i);
-                  t.setText((String) tableModel.getValueAt(where-1, i));
-                  }
-            }
-
-            c  = (JCheckBox) fldObjects.elementAt(i);
-            Boolean bln = (Boolean)tableModel.getValueAt(where-1, i);
-            c.setSelected(bln.booleanValue());
-
-         } // try
-
-         catch (Exception e1) {
-			 e1.printStackTrace();
-			 System.exit(2);
-			 }
-        }
-
-
-public static void addComponent (Container container, Component component,
-    int gridx, int gridy, int gridwidth, int gridheight, int fill,
-    int anchor) throws AWTException {
-    LayoutManager lm = container.getLayout();
-    if (!(lm instanceof GridBagLayout)) {
-        throw new AWTException ("Invalid layout" + lm);
-    } else {
-        GridBagConstraints gbc = new GridBagConstraints ();
-        gbc.gridx = gridx;
-        gbc.gridy = gridy;
-        gbc.gridwidth = gridwidth;
-        gbc.gridheight = gridheight;
-        gbc.fill = fill;
-        gbc.anchor = anchor;
-        ((GridBagLayout)lm).setConstraints(component, gbc);
-        container.add (component);
-    }
-}
-
-}
-
-
-class dbfTableRecordMemoDialog extends JDialog implements ActionListener, WindowListener
-  {
-    /**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
-	public JButton Okay = new JButton("Okay");
-    public JButton Cancel = new JButton("Cancel");
-    public JTextArea text = new JTextArea();
-    public int row, col;
-    dbfTableModel tableModel;
-    dbfViewer parent;
-    JPanel fr;
-
-    public dbfTableRecordMemoDialog(dbfViewer inParent, JPanel inFr, dbfTableModel indbfTableModel, int inRow, int inCol)
-      {
-         super(inParent, "Memo Field", true);
-         parent = inParent;
-         fr = inFr;
-         addWindowListener(this);
-         tableModel = indbfTableModel;
-         row = inRow;
-         col = inCol;
-         try {
-            Field f = indbfTableModel.getColumnField(inCol);
-            setTitle(f.getName());
 		}
-		 catch (Exception e1) {System.err.println("Failed to get column name");}
+		KeyDispatcher keyDispatcher = new KeyDispatcher();
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(keyDispatcher);
 
-         text.setText((String) tableModel.getValueAt(row, col));
-         JScrollPane jsp = new JScrollPane(text);
-         jsp.setPreferredSize(new Dimension(230,160));
-         jsp.setBorder(BorderFactory.createEtchedBorder());
-         this.getContentPane().add("Center", jsp);
+	}
 
-         JPanel p =  new JPanel();
-         p.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
-         p.add(Okay);
-         Okay.addActionListener(this);
-         this.getContentPane().add("East", p);
-         p.add(Cancel);
-         Cancel.addActionListener(this);
-         this.getContentPane().add("West", p);
-         this.pack();
-         
-     	class KeyDispatcher implements KeyEventDispatcher {
+	public void setupDBFields() throws Exception
+	{
+		setLayout(null);
+		Dimension dimView = sp.getSize();
+		int height = 0, width = 50;
+		removeAll();
 
-     		 
-     		public boolean dispatchKeyEvent(KeyEvent e) {
-     			parent.fileChanged = true;
-     			return false;
-     		}
-         	
-         }
-         KeyDispatcher keyDispatcher = new KeyDispatcher();
-         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyDispatcher);
-      }
+		gb = new GridBagLayout();
+		gbc = new GridBagConstraints();
+		setLayout(gb);
 
-     public void actionPerformed(ActionEvent event)
-     {
-        if (event.getSource() == Cancel) {
-           setVisible(false);
-           dispose();
-           parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           return;
-          }
+		int i;
+		if (tableModel.getColumnCount() > 0) {
+			fldObjects = new Vector<Component>(tableModel.getColumnCount() - 1);
+			Field f;
+			for (i = 0; i < tableModel.getColumnCount() - 1; i++) {
 
-        if (event.getSource() == Okay)
-          {
-             setVisible(false);
-             tableModel.setValueAt(text.getText(),row, col);
-		     tableModel.fireTableCellUpdated(row, col);
-             parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-             fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-             dispose();
-          }
-       }
+				f = tableModel.getColumnField(i);
+				if (f.getType() == 'M' || f.getType() == 'P') {
+					b = new JButton(f.getName());
+					b.setActionCommand("M" + i);
+					b.addActionListener(this);
+					addComponent(this, b, 1, i, 1, 1,
+							GridBagConstraints.HORIZONTAL,
+							GridBagConstraints.EAST);
+					fldObjects.addElement(b);
+				} else if (f.getType() == 'L') {
+					c = new JCheckBox(f.getName(), true);
+					c.setActionCommand("L" + i);
+					c.addActionListener(this);
+					addComponent(this, c, 1, i, 1, 1,
+							GridBagConstraints.HORIZONTAL,
+							GridBagConstraints.EAST);
+					fldObjects.addElement(c);
+				} else {
+					l = new JLabel(f.getName(), Label.RIGHT);
+					addComponent(this, l, 0, i, 1, 1,
+							GridBagConstraints.HORIZONTAL,
+							GridBagConstraints.EAST);
+					int ln = f.getLength();
+					if (ln > 100) {
+						ln = 100;
+					}
+					t = new JTextField(f.getName(), ln);
+					t.setName(f.getName());
+					t.setActionCommand("T" + i);
+					t.getDocument().addDocumentListener(parent);
+					t.getDocument().putProperty("name", "" + i);
+					t.setEditable(true);
+					if (width < ln * 10) {
+						width = ln * 10;
+					}
+					addComponent(this, t, 1, i, ln, 1,
+							GridBagConstraints.HORIZONTAL,
+							GridBagConstraints.EAST);
+					fldObjects.addElement(t);
+				}
+				height += 10;
+			}
 
+			c = new JCheckBox("Deleted");
+			c.setActionCommand("L" + i);
+			c.addActionListener(this);
+			addComponent(this, c, 1, i, 1, 1, GridBagConstraints.HORIZONTAL,
+					GridBagConstraints.EAST);
+			fldObjects.addElement(c);
+			height += 10;
 
-    public void windowClosing(WindowEvent event) {
-            dispose();
-            parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           }
+		}
+		dimView.setSize(width + 150, height + 150);
+		sp.setSize(dimView);
+	}
 
+	@Override
+	public void actionPerformed(ActionEvent e)
+	{
+		int col = Integer.parseInt(e.getActionCommand().substring(1));
 
-    public void windowClosed(WindowEvent event) { }
+		switch (e.getActionCommand().charAt(0)) {
+		case 'M':
+			parent.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+			new dbfTableRecordMemoDialog(parent, this, tableModel,
+					parent.editingRow, col).setVisible(true);
+			break;
+		case 'L':
+			c = (JCheckBox) fldObjects.elementAt(col);
+			tableModel.setValueAt(Boolean.valueOf(c.isSelected()),
+					parent.editingRow, col);
+			tableModel.fireTableCellUpdated(parent.editingRow, col);
+			break;
+		/*
+		 * case 'T': t = (JTextField) fldObjects.elementAt(col);
+		 * tableModel.setValueAt(t.getText(), parent.editingRow, col);
+		 * tableModel.fireTableCellUpdated(here, col+1); break;
+		 * 
+		 */
+		}
 
-    public void windowDeiconified(WindowEvent event) { }
+	}
 
-    public void windowIconified(WindowEvent event) { }
+	public void goTo(int where)
+	{
+		parent.editingRow = where - 1;
+		try {
+			if (where < 1) {
+				return;
+			}
+			if (where > tableModel.getRowCount()) {
+				return;
+			}
 
-    public void windowActivated(WindowEvent event) { }
+			Field f;
 
-    public void windowDeactivated(WindowEvent event) { }
+			JCheckBox c;
+			JTextField t;
+			int i;
 
-    public void windowOpened(WindowEvent event) { }
-    
- 
+			for (i = 0; i < tableModel.getColumnCount() - 1; i++) {
+				f = tableModel.getColumnField(i);
+				if (f instanceof MemoField) {
+				} else if (f.getType() == 'L') {
+					c = (JCheckBox) fldObjects.elementAt(i);
+					Boolean bln = (Boolean) tableModel.getValueAt(where - 1, i);
+					c.setSelected(bln.booleanValue());
+				} else {
+					t = (JTextField) fldObjects.elementAt(i);
+					t.setText((String) tableModel.getValueAt(where - 1, i));
+				}
+			}
+
+			c = (JCheckBox) fldObjects.elementAt(i);
+			Boolean bln = (Boolean) tableModel.getValueAt(where - 1, i);
+			c.setSelected(bln.booleanValue());
+
+		} // try
+
+		catch (Exception e1) {
+			e1.printStackTrace();
+			System.exit(2);
+		}
+	}
+
+	public static void addComponent(Container container, Component component,
+			int gridx, int gridy, int gridwidth, int gridheight, int fill,
+			int anchor) throws AWTException
+	{
+		LayoutManager lm = container.getLayout();
+		if (!(lm instanceof GridBagLayout)) {
+			throw new AWTException("Invalid layout" + lm);
+		} else {
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = gridx;
+			gbc.gridy = gridy;
+			gbc.gridwidth = gridwidth;
+			gbc.gridheight = gridheight;
+			gbc.fill = fill;
+			gbc.anchor = anchor;
+			((GridBagLayout) lm).setConstraints(component, gbc);
+			container.add(component);
+		}
+	}
 
 }
 
-
-
-
-class dbfViewerSearchDialog extends JDialog implements ActionListener, WindowListener
-  {
-    /**
+class dbfTableRecordMemoDialog extends JDialog
+		implements ActionListener, WindowListener
+{
+	/**
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	public JButton Okay = new JButton("Okay");
-    public JButton Cancel = new JButton("Cancel");
-    public JTextField text = new JTextField();
-    public JCheckBox jcb[];
-    dbfViewer parent;
-    dbfTableModel model;
+	public JButton Cancel = new JButton("Cancel");
+	public JTextArea text = new JTextArea();
+	public int row, col;
+	dbfTableModel tableModel;
+	dbfViewer parent;
+	JPanel fr;
 
-    public dbfViewerSearchDialog(dbfViewer  inParent, dbfTableModel inModel, String inText, boolean inFields[])
-      {
-         super(inParent, "Find Data", true);
-         parent = inParent;
-         model = inModel;
+	public dbfTableRecordMemoDialog(dbfViewer inParent, JPanel inFr,
+			dbfTableModel indbfTableModel, int inRow, int inCol)
+	{
+		super(inParent, "Memo Field", true);
+		parent = inParent;
+		fr = inFr;
+		addWindowListener(this);
+		tableModel = indbfTableModel;
+		row = inRow;
+		col = inCol;
+		try {
+			Field f = indbfTableModel.getColumnField(inCol);
+			setTitle(f.getName());
+		} catch (Exception e1) {
+			System.err.println("Failed to get column name");
+		}
 
+		text.setText((String) tableModel.getValueAt(row, col));
+		JScrollPane jsp = new JScrollPane(text);
+		jsp.setPreferredSize(new Dimension(230, 160));
+		jsp.setBorder(BorderFactory.createEtchedBorder());
+		this.getContentPane().add("Center", jsp);
 
-         addWindowListener(this);
-         setTitle("Search Fields");
+		JPanel p = new JPanel();
+		p.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
+		p.add(Okay);
+		Okay.addActionListener(this);
+		this.getContentPane().add("East", p);
+		p.add(Cancel);
+		Cancel.addActionListener(this);
+		this.getContentPane().add("West", p);
+		this.pack();
 
-         JPanel p =  new JPanel();
-         p.setLayout(new GridLayout(0,1));
+		class KeyDispatcher implements KeyEventDispatcher
+		{
 
-         text.setText(inText);
-         p.add(text);
+			@Override
+			public boolean dispatchKeyEvent(KeyEvent e)
+			{
+				parent.fileChanged = true;
+				return false;
+			}
 
-         jcb = new JCheckBox[inModel.getColumnCount()-1];
-         for (int i = 0; i < inModel.getColumnCount()-1; i++)
-           {
-			   jcb[i] = new JCheckBox(inModel.getColumnName(i));
-			   if (i < inFields.length)
-			      jcb[i].setSelected(inFields[i]);
-			   p.add(jcb[i]);
-		  }
+		}
+		KeyDispatcher keyDispatcher = new KeyDispatcher();
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(keyDispatcher);
+	}
 
-         this.getContentPane().add("Center", p);
+	@Override
+	public void actionPerformed(ActionEvent event)
+	{
+		if (event.getSource() == Cancel) {
+			setVisible(false);
+			dispose();
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			return;
+		}
 
-         JPanel p2 = new JPanel();
-         p2.setLayout(new GridLayout(1,0));
-         p2.add(Okay);
-         Okay.addActionListener(this);
-         getRootPane().setDefaultButton(Okay);
-         p2.add(Cancel);
-         Cancel.addActionListener(this);
+		if (event.getSource() == Okay) {
+			setVisible(false);
+			tableModel.setValueAt(text.getText(), row, col);
+			tableModel.fireTableCellUpdated(row, col);
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			dispose();
+		}
+	}
 
-         this.getContentPane().add("South", p2);
-         this.pack();
-      }
+	@Override
+	public void windowClosing(WindowEvent event)
+	{
+		dispose();
+		parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		fr.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	}
 
-     public void actionPerformed(ActionEvent event)
-     {
-        if (event.getSource() == Cancel) {
-           setVisible(false);
-           dispose();
-           parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           return;
-          }
+	@Override
+	public void windowClosed(WindowEvent event)
+	{
+	}
 
-        if (event.getSource() == Okay)
-          {
+	@Override
+	public void windowDeiconified(WindowEvent event)
+	{
+	}
 
-			 String s = text.getText().trim();
+	@Override
+	public void windowIconified(WindowEvent event)
+	{
+	}
 
-			 if (s.length() < 1)
-			    {
-                    JOptionPane.showMessageDialog(parent, "Enter Search Text",
-                             "Enter Search Text", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-			 int i;
-	         for ( i = 0; i < model.getColumnCount()-1; i++)
-	           {
-				   if (jcb[i].isSelected())
-				     break;
-			  }
+	@Override
+	public void windowActivated(WindowEvent event)
+	{
+	}
 
-			 if (i ==  model.getColumnCount()-1)
-			  {
-					   JOptionPane.showMessageDialog(parent, "Select one or more fields to search in",
-                             "Select A Field", JOptionPane.ERROR_MESSAGE);
-    			   return;
-		      }
+	@Override
+	public void windowDeactivated(WindowEvent event)
+	{
+	}
 
-             boolean setfields[] = new boolean[model.getColumnCount()-1];
-
-	         for ( i = 0; i < model.getColumnCount()-1; i++)
-	           {
-				   setfields[i] = jcb[i].isSelected();
-			  }
-
-             setVisible(false);
-             parent.searchSet(s, setfields);
-             parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-             dispose();
-          }
-       }
-
-
-    public void windowClosing(WindowEvent event) {
-            dispose();
-            parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-           }
-
-
-    public void windowClosed(WindowEvent event) { }
-
-    public void windowDeiconified(WindowEvent event) { }
-
-    public void windowIconified(WindowEvent event) { }
-
-    public void windowActivated(WindowEvent event) { }
-
-    public void windowDeactivated(WindowEvent event) { }
-
-    public void windowOpened(WindowEvent event) { }
+	@Override
+	public void windowOpened(WindowEvent event)
+	{
+	}
 
 }
 
+class dbfViewerSearchDialog extends JDialog
+		implements ActionListener, WindowListener
+{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+	public JButton Okay = new JButton("Okay");
+	public JButton Cancel = new JButton("Cancel");
+	public JTextField text = new JTextField();
+	public JCheckBox jcb[];
+	dbfViewer parent;
+	dbfTableModel model;
 
+	public dbfViewerSearchDialog(dbfViewer inParent, dbfTableModel inModel,
+			String inText, boolean inFields[])
+	{
+		super(inParent, "Find Data", true);
+		parent = inParent;
+		model = inModel;
+
+		addWindowListener(this);
+		setTitle("Search Fields");
+
+		JPanel p = new JPanel();
+		p.setLayout(new GridLayout(0, 1));
+
+		text.setText(inText);
+		p.add(text);
+
+		jcb = new JCheckBox[inModel.getColumnCount() - 1];
+		for (int i = 0; i < inModel.getColumnCount() - 1; i++) {
+			jcb[i] = new JCheckBox(inModel.getColumnName(i));
+			if (i < inFields.length) {
+				jcb[i].setSelected(inFields[i]);
+			}
+			p.add(jcb[i]);
+		}
+
+		this.getContentPane().add("Center", p);
+
+		JPanel p2 = new JPanel();
+		p2.setLayout(new GridLayout(1, 0));
+		p2.add(Okay);
+		Okay.addActionListener(this);
+		getRootPane().setDefaultButton(Okay);
+		p2.add(Cancel);
+		Cancel.addActionListener(this);
+
+		this.getContentPane().add("South", p2);
+		this.pack();
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event)
+	{
+		if (event.getSource() == Cancel) {
+			setVisible(false);
+			dispose();
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			return;
+		}
+
+		if (event.getSource() == Okay) {
+
+			String s = text.getText().trim();
+
+			if (s.length() < 1) {
+				JOptionPane.showMessageDialog(parent, "Enter Search Text",
+						"Enter Search Text", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			int i;
+			for (i = 0; i < model.getColumnCount() - 1; i++) {
+				if (jcb[i].isSelected()) {
+					break;
+				}
+			}
+
+			if (i == model.getColumnCount() - 1) {
+				JOptionPane.showMessageDialog(parent,
+						"Select one or more fields to search in",
+						"Select A Field", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			boolean setfields[] = new boolean[model.getColumnCount() - 1];
+
+			for (i = 0; i < model.getColumnCount() - 1; i++) {
+				setfields[i] = jcb[i].isSelected();
+			}
+
+			setVisible(false);
+			parent.searchSet(s, setfields);
+			parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			dispose();
+		}
+	}
+
+	@Override
+	public void windowClosing(WindowEvent event)
+	{
+		dispose();
+		parent.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+	}
+
+	@Override
+	public void windowClosed(WindowEvent event)
+	{
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent event)
+	{
+	}
+
+	@Override
+	public void windowIconified(WindowEvent event)
+	{
+	}
+
+	@Override
+	public void windowActivated(WindowEvent event)
+	{
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent event)
+	{
+	}
+
+	@Override
+	public void windowOpened(WindowEvent event)
+	{
+	}
+
+}

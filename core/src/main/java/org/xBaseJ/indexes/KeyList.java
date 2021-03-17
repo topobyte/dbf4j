@@ -1,4 +1,5 @@
 package org.xBaseJ.indexes;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,33 +30,40 @@ package org.xBaseJ.indexes;
  *
 */
 
-
 import java.util.Comparator;
 
 /**
  * @author Joe McVerry - American Coders, Ltd.
  *
- * a comparator class for keylist objects
+ *         a comparator class for keylist objects
  */
-public class KeyList implements Comparator<Object> {
-    NodeKey value;
-    int where;
+public class KeyList implements Comparator<Object>
+{
+	NodeKey value;
+	int where;
+
 	/**
 	 *
 	 */
-	public KeyList(NodeKey v, int i) {
+	public KeyList(NodeKey v, int i)
+	{
 		value = v;
-		where=i;
+		where = i;
 	}
 
-	public int getWhere(){
+	public int getWhere()
+	{
 		return where;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
-	public int compare(Object arg0, Object arg1) {
+	@Override
+	public int compare(Object arg0, Object arg1)
+	{
 		KeyList a = (KeyList) arg0;
 		KeyList b = (KeyList) arg1;
 		return a.value.compareKey(b.value);

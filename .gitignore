@@ -6,3 +6,4 @@ doc
 .classpath
 .gradle
 .settings
+*.swp

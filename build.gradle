@@ -90,6 +90,7 @@ project(':dbf4j') {
     dependencies {
         compile 'org.slf4j:slf4j-api:1.6.1'
         testCompile 'junit:junit:4.+'
+        testCompile 'de.topobyte:system-utils:0.0.1'
     }
 }
 

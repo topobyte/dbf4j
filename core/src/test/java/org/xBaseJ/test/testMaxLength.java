@@ -1,4 +1,9 @@
 package org.xBaseJ.test;
+
+import org.xBaseJ.DBF;
+import org.xBaseJ.Util;
+import org.xBaseJ.fields.CharField;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,16 +34,13 @@ package org.xBaseJ.test;
  *
 */
 
-
 import junit.framework.TestCase;
 
-import org.xBaseJ.DBF;
-import org.xBaseJ.Util;
-import org.xBaseJ.fields.CharField;
+public class testMaxLength extends TestCase
+{
 
-public class testMaxLength extends TestCase {
-
-	public void testMaxFieldLength() {
+	public void testMaxFieldLength()
+	{
 		try {
 			Util.setxBaseJProperty("ignoreDBFLengthCheck", "true");
 			DBF d1 = new DBF("testfiles/test.dbf", true);

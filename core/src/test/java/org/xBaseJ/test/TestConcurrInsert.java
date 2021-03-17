@@ -1,4 +1,10 @@
 package org.xBaseJ.test;
+
+import org.xBaseJ.DBF;
+import org.xBaseJ.fields.CharField;
+import org.xBaseJ.fields.Field;
+import org.xBaseJ.fields.NumField;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -34,100 +40,96 @@ package org.xBaseJ.test;
  *
 */
 
-
 import junit.framework.TestCase;
 
-import org.xBaseJ.DBF;
-import org.xBaseJ.fields.CharField;
-import org.xBaseJ.fields.Field;
-import org.xBaseJ.fields.NumField;
-
-public class TestConcurrInsert extends TestCase {
+public class TestConcurrInsert extends TestCase
+{
 
 	public void testConncur()
 	{
-	    try {
-		      // set the lock property
-		      org.xBaseJ.Util.setxBaseJProperty("useSharedLocks", "false");
+		try {
+			// set the lock property
+			org.xBaseJ.Util.setxBaseJProperty("useSharedLocks", "false");
 
-		      // create previously a dbf
-		      DBF writer = new DBF("testfiles/concurr.dbf", true);
-		      Field str_field = new CharField("thread", 15);
-		      Field int_field = new NumField("rownum", 5, 0);
-		      writer.addField(str_field);
-		      writer.addField(int_field);
-		      // add a row
-		      str_field.put("main thread");
-		      int_field.put("-1");
-		      writer.write();
-		      writer.close();
+			// create previously a dbf
+			DBF writer = new DBF("testfiles/concurr.dbf", true);
+			Field str_field = new CharField("thread", 15);
+			Field int_field = new NumField("rownum", 5, 0);
+			writer.addField(str_field);
+			writer.addField(int_field);
+			// add a row
+			str_field.put("main thread");
+			int_field.put("-1");
+			writer.write();
+			writer.close();
 
-		      // the first thread that will insert rows with the index=1
-		      Thread thread1 = new ConcurrInsert(1);
-		      // the second thread that will insert rows with the index=2
-		      Thread thread2 = new ConcurrInsert(2);
-		      Thread thread3 = new ConcurrInsert(3);
+			// the first thread that will insert rows with the index=1
+			Thread thread1 = new ConcurrInsert(1);
+			// the second thread that will insert rows with the index=2
+			Thread thread2 = new ConcurrInsert(2);
+			Thread thread3 = new ConcurrInsert(3);
 
-		      // start threads
-		      thread1.start();
-		      thread2.start();
-		      thread3.start();
-		      while (thread1.isAlive() || thread2.isAlive() || thread3.isAlive()){Thread.sleep(100);}
-		    }
-		    catch (Exception ex) {
-		    	ex.printStackTrace();
-		      fail(ex.getMessage());
-		    }
-		     DBF reader;
-			try {
-				reader = new DBF("testfiles/concurr.dbf");
-			     assertEquals(3*49+1, reader.getRecordCount());
+			// start threads
+			thread1.start();
+			thread2.start();
+			thread3.start();
+			while (thread1.isAlive() || thread2.isAlive()
+					|| thread3.isAlive()) {
+				Thread.sleep(100);
 			}
-		    catch (Exception ex) {
-					      fail(ex.getMessage());
-					    }
-		  }
-
-
-
-
-
-	private class ConcurrInsert extends Thread{
-		  private int threadIndex = -1;
-		  private DBF writer = null;
-
-		  public ConcurrInsert(int threadIndex) throws Exception{
-		    // open a DBF file
-		     writer = new DBF("testfiles/concurr.dbf");
-		     this.threadIndex = threadIndex;
-		  }
-
-	public void run() {
-	    try {
-		// ### thread adds new rows ###
-		Field str_field = writer.getField(1);
-		Field int_field = writer.getField(2);
-
-		for (int i = 0; i < 49; i++) {
-		    int_field.put(String.valueOf(i));
-		    str_field.put("Thread" + threadIndex);
-		    int_field.put("" + i);
-		    writer.lock();
-		    writer.write(true);
-		    writer.unlock();
-		    sleep(100);
-		    synchronized (TestConcurrInsert.class) {
-			    System.out.println("Thread " + threadIndex
-				    + " has inserted " + i + " row");
-		    }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			fail(ex.getMessage());
 		}
-		// close a dbf
-		writer.close();
-		System.out.println("done "+threadIndex);
-	    } catch (Exception ex) {
-		ex.printStackTrace();
-	    }
+		DBF reader;
+		try {
+			reader = new DBF("testfiles/concurr.dbf");
+			assertEquals(3 * 49 + 1, reader.getRecordCount());
+		} catch (Exception ex) {
+			fail(ex.getMessage());
+		}
 	}
-    }
+
+	private class ConcurrInsert extends Thread
+	{
+		private int threadIndex = -1;
+		private DBF writer = null;
+
+		public ConcurrInsert(int threadIndex) throws Exception
+		{
+			// open a DBF file
+			writer = new DBF("testfiles/concurr.dbf");
+			this.threadIndex = threadIndex;
+		}
+
+		@Override
+		public void run()
+		{
+			try {
+				// ### thread adds new rows ###
+				Field str_field = writer.getField(1);
+				Field int_field = writer.getField(2);
+
+				for (int i = 0; i < 49; i++) {
+					int_field.put(String.valueOf(i));
+					str_field.put("Thread" + threadIndex);
+					int_field.put("" + i);
+					writer.lock();
+					writer.write(true);
+					writer.unlock();
+					sleep(100);
+					synchronized (TestConcurrInsert.class) {
+						System.out.println("Thread " + threadIndex
+								+ " has inserted " + i + " row");
+					}
+				}
+				// close a dbf
+				writer.close();
+				System.out.println("done " + threadIndex);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
 
 }

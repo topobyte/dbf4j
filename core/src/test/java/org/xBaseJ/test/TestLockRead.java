@@ -1,4 +1,8 @@
 package org.xBaseJ.test;
+
+import org.xBaseJ.DBF;
+import org.xBaseJ.fields.Field;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,45 +33,42 @@ package org.xBaseJ.test;
  *
 */
 
-
 import junit.framework.TestCase;
-
-import org.xBaseJ.DBF;
-import org.xBaseJ.fields.Field;
 
 /**
  * @author Joe McVerry - American Coders, Ltd.
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class TestLockRead extends  TestCase {
+public class TestLockRead extends TestCase
+{
 
 	/**
 	 *
 	 */
 
-	public void testReadLock() {
+	public void testReadLock()
+	{
 	}
-	public void threadThis() {
 
-	 try {
+	public void threadThis()
+	{
 
-		DBF writer = new DBF("testfiles/temp.dbf");
-		for (int i = 0; i < writer.getRecordCount(); i++) {
-			writer.read(true);
-			Field str_field = writer.getField(1);
-			System.out.println(str_field.get());
+		try {
+
+			DBF writer = new DBF("testfiles/temp.dbf");
+			for (int i = 0; i < writer.getRecordCount(); i++) {
+				writer.read(true);
+				Field str_field = writer.getField(1);
+				System.out.println(str_field.get());
+			}
+			writer.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
 		}
-		writer.close();
-
-
-	 }
-	 catch (Exception e)
-	 {
-	 	e.printStackTrace();
-	 	fail(e.getMessage());
-	 }
 
 	}
 }

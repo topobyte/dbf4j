@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
-
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.DateField;
 
-public class TestDatePutCalendar  extends TestCase{
+import junit.framework.TestCase;
 
-	public void testDatePutCalendar() {
+public class TestDatePutCalendar extends TestCase
+{
+
+	public void testDatePutCalendar()
+	{
 		try {
 			DateField df = new DateField("test");
 			df.put(Calendar.getInstance());
@@ -23,12 +25,11 @@ public class TestDatePutCalendar  extends TestCase{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
-	
-
-	public void testDatePutDate() {
+	public void testDatePutDate()
+	{
 		try {
 			DateField df = new DateField("test");
 			df.put(Calendar.getInstance().getTime());
@@ -39,7 +40,7 @@ public class TestDatePutCalendar  extends TestCase{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	   
+
 }

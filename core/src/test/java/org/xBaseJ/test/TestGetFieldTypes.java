@@ -11,9 +11,11 @@ import org.xBaseJ.fields.PictureField;
 
 import junit.framework.TestCase;
 
-public class TestGetFieldTypes extends TestCase {
+public class TestGetFieldTypes extends TestCase
+{
 
-	public void testCharField() throws Exception{
+	public void testCharField() throws Exception
+	{
 		CharField f = new CharField("a", 1);
 		assertEquals(true, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -24,7 +26,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testDateField() throws Exception{
+
+	public void testDateField() throws Exception
+	{
 		DateField f = new DateField("a");
 		assertEquals(false, f.isCharField());
 		assertEquals(true, f.isDateField());
@@ -35,7 +39,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testFloatField() throws Exception{
+
+	public void testFloatField() throws Exception
+	{
 		FloatField f = new FloatField("a", 10, 2);
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -46,7 +52,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testLogicalField() throws Exception{
+
+	public void testLogicalField() throws Exception
+	{
 		LogicalField f = new LogicalField("a");
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -57,7 +65,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testMemoField() throws Exception{
+
+	public void testMemoField() throws Exception
+	{
 		MemoField f = new MemoField("a");
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -68,7 +78,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testNumField() throws Exception{
+
+	public void testNumField() throws Exception
+	{
 		NumField f = new NumField("a", 10, 2);
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -79,7 +91,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(false, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testPictureField() throws Exception{
+
+	public void testPictureField() throws Exception
+	{
 		PictureField f = new PictureField("a");
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());
@@ -90,7 +104,9 @@ public class TestGetFieldTypes extends TestCase {
 		assertEquals(true, f.isPictureField());
 		assertEquals(false, f.isCurrencyFIeld());
 	}
-	public void testCurrencyField() throws Exception{
+
+	public void testCurrencyField() throws Exception
+	{
 		CurrencyField f = new CurrencyField("a");
 		assertEquals(false, f.isCharField());
 		assertEquals(false, f.isDateField());

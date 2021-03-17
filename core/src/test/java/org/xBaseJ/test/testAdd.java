@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,22 +30,24 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.CharField;
 
-public class testAdd extends TestCase {
+import junit.framework.TestCase;
 
-	public static void main(String[] args) {
+public class testAdd extends TestCase
+{
+
+	public static void main(String[] args)
+	{
 		junit.textui.TestRunner.run(testAdd.class);
 	}
 
-	public void testNewCharField() {
+	public void testNewCharField()
+	{
 
 		try {
 			DBF d1 = new DBF("testfiles/a.dbf", true);
@@ -54,7 +57,9 @@ public class testAdd extends TestCase {
 			e.printStackTrace();
 		}
 	}
-	public void testReaddSame() {
+
+	public void testReaddSame()
+	{
 
 		try {
 			DBF d1 = new DBF("testfiles/a.dbf");
@@ -63,9 +68,7 @@ public class testAdd extends TestCase {
 			fail("shouldn't be able to add field again");
 		} catch (xBaseJException e) {
 			;
-		}
-		catch (IOException ei)
-		{
+		} catch (IOException ei) {
 			fail(ei.getMessage());
 		}
 	}

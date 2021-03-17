@@ -1,6 +1,8 @@
 package org.xBaseJ.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
@@ -8,10 +10,12 @@ import org.junit.Test;
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.LogicalField;
 
-public class TestLogical {
+public class TestLogical
+{
 
 	@Test
-	public void test() {
+	public void test()
+	{
 		try {
 			LogicalField lf = new LogicalField("a");
 			lf.put("");

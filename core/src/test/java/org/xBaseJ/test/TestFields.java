@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,11 +30,8 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.File;
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.xBaseJException;
@@ -45,45 +43,48 @@ import org.xBaseJ.fields.LogicalField;
 import org.xBaseJ.fields.NumField;
 import org.xBaseJ.fields.PictureField;
 
+import junit.framework.TestCase;
 
-public class TestFields extends TestCase {
-
-
+public class TestFields extends TestCase
+{
 
 	CharField f;
 
-	public  void setUp(){
+	@Override
+	public void setUp()
+	{
 		try {
-			 f = new CharField("test", 10);
+			f = new CharField("test", 10);
 		} catch (xBaseJException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-}
-
+	}
 
 	/*
 	 * Test method for 'org.xBaseJ.Field.put(String)'
 	 */
-	public void testPutString() {
+	public void testPutString()
+	{
 		try {
 			f.put("a");
 		} catch (xBaseJException e) {
 			fail(e.getMessage());
 		}
-		TestFields.assertEquals("a",f.get());
+		TestFields.assertEquals("a", f.get());
 
 	}
-	
-	public void testType()  {
+
+	public void testType()
+	{
 		try {
-			CharField  c = new CharField("C", 1);
+			CharField c = new CharField("C", 1);
 			assertEquals('C', c.getType());
-			DateField  d = new DateField("D");
+			DateField d = new DateField("D");
 			assertEquals('D', d.getType());
-			FloatField f = new FloatField("F", 10, 2); 
+			FloatField f = new FloatField("F", 10, 2);
 			assertEquals('F', f.getType());
 			NumField n = new NumField("N", 10, 2);
 			assertEquals('N', n.getType());
@@ -93,35 +94,34 @@ public class TestFields extends TestCase {
 			assertEquals('P', p.getType());
 			CurrencyField cc = new CurrencyField("Money");
 			assertEquals('Y', cc.getType());
-			
+
 		} catch (xBaseJException e) {
 			fail(e.getMessage());
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 	}
-	
-	
-	public void testFloat() {
-	    try {
-		DBF db = new DBF("testfiles/float.dbf", true);
-		FloatField f = new FloatField("F", 10,3);
-		db.addField(f);
-		f.put(987.123f);
-		db.write();
-		db.close();
-		db = new DBF("testfiles/float.dbf");
-		f = (FloatField) db.getField("F");
-		db.read();
-		assertEquals("   987.123", f.get());
+
+	public void testFloat()
+	{
+		try {
+			DBF db = new DBF("testfiles/float.dbf", true);
+			FloatField f = new FloatField("F", 10, 3);
+			db.addField(f);
+			f.put(987.123f);
+			db.write();
+			db.close();
+			db = new DBF("testfiles/float.dbf");
+			f = (FloatField) db.getField("F");
+			db.read();
+			assertEquals("   987.123", f.get());
 		} catch (xBaseJException e) {
 			fail(e.getMessage());
 		} catch (IOException e) {
 			fail(e.getMessage());
-		}
-		finally {
-		    File f = new File("testfiles/float.dbf");
-		    f.delete();
+		} finally {
+			File f = new File("testfiles/float.dbf");
+			f.delete();
 		}
 	}
 

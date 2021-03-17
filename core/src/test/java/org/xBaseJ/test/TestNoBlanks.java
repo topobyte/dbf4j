@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,25 +30,26 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.Util;
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.CharField;
 import org.xBaseJ.fields.DateField;
 
+import junit.framework.TestCase;
 
+public class TestNoBlanks extends TestCase
+{
 
-public class TestNoBlanks extends TestCase {
-
-	public TestNoBlanks(String arg0) {
+	public TestNoBlanks(String arg0)
+	{
 		super(arg0);
 	}
 
-	public void setUp() {
+	@Override
+	public void setUp()
+	{
 		try {
 			super.setUp();
 		} catch (Exception e) {
@@ -56,28 +58,25 @@ public class TestNoBlanks extends TestCase {
 		}
 		try {
 			Util.closexBaseJProperty();
-			Util.copyFile("testfiles/noblanks.xBaseJ.txt", "org.xBaseJ.properties");
+			Util.copyFile("testfiles/noblanks.xBaseJ.txt",
+					"org.xBaseJ.properties");
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.exit(0);
 		}
 	}
 
+	public void testBlank()
+	{
 
-	public void testBlank(){
-
-		assertTrue(org.xBaseJ.Util.dontTrimFields()==false);
+		assertTrue(org.xBaseJ.Util.dontTrimFields() == false);
 		/*
-		try {
-			Util.setxBaseJProperty("fieldFilledWithSpaces", "true");
-		} catch (IOException e1) {
-
-			e1.printStackTrace();
-			fail(e1.getMessage());
-		}*/
+		 * try { Util.setxBaseJProperty("fieldFilledWithSpaces", "true"); }
+		 * catch (IOException e1) {
+		 * 
+		 * e1.printStackTrace(); fail(e1.getMessage()); }
+		 */
 		assertTrue(org.xBaseJ.Util.fieldFilledWithSpaces());
-
-
 
 		try {
 			CharField f = new CharField("char", 5);
@@ -94,10 +93,13 @@ public class TestNoBlanks extends TestCase {
 
 	}
 
-	public void tearDown() {
+	@Override
+	public void tearDown()
+	{
 		try {
 			Util.closexBaseJProperty();
-			Util.copyFile("testfiles/reset.xBaseJ.txt", "org.xBaseJ.properties");
+			Util.copyFile("testfiles/reset.xBaseJ.txt",
+					"org.xBaseJ.properties");
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.exit(0);

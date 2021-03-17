@@ -1,4 +1,8 @@
 package org.xBaseJ.test;
+
+import org.xBaseJ.DBF;
+import org.xBaseJ.xBaseJException;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,16 +33,13 @@ package org.xBaseJ.test;
  *
 */
 
-
 import junit.framework.TestCase;
 
-import org.xBaseJ.DBF;
-import org.xBaseJ.xBaseJException;
+public class testMDXBy2ndParty extends TestCase
+{
 
-
-public class testMDXBy2ndParty extends TestCase {
-
-	public void testMDX() {//test MDX updated by DBF Manager
+	public void testMDX()
+	{// test MDX updated by DBF Manager
 		DBF aDB = null;
 		try {
 			aDB = new DBF("c:/temp/statezip.dbf");
@@ -57,7 +58,6 @@ public class testMDXBy2ndParty extends TestCase {
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-
 
 	}
 }

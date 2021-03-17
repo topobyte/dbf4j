@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,38 +30,39 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.IOException;
 import java.nio.channels.OverlappingFileLockException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.fields.CharField;
 import org.xBaseJ.fields.Field;
 
+import junit.framework.TestCase;
+
 /**
  * @author Joe McVerry - American Coders, Ltd.
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *         To change the template for this generated type comment go to
+ *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class TestLockUpdateClose extends TestCase {
+public class TestLockUpdateClose extends TestCase
+{
 
 	/**
 	 *
 	 */
-	public void setup() {
+	public void setup()
+	{
 
 	}
 
-	public void testLockUpdateWithClose() {
-//		String os = System.getProperty("os.name").toLowerCase();
-//		//linux or unix
-//	    if (os.indexOf( "nix") >=0 || os.indexOf( "nux") >=0)
-//	    	return;
+	public void testLockUpdateWithClose()
+	{
+		// String os = System.getProperty("os.name").toLowerCase();
+		// //linux or unix
+		// if (os.indexOf( "nix") >=0 || os.indexOf( "nux") >=0)
+		// return;
 
-		 
 		DBF writer = null;
 		try {
 			writer = new DBF("testfiles/temp2.dbf", true);
@@ -76,18 +78,16 @@ public class TestLockUpdateClose extends TestCase {
 			// update the first record
 			writer.gotoRecord(1, true);
 			str_field.put("updated");
-		} 
-		catch (OverlappingFileLockException oe)
-		{
-		 ;	
-		}catch (Exception ex2) {
+		} catch (OverlappingFileLockException oe) {
+			;
+		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			fail(ex2.getMessage());
 		}
 		try {
 			writer.update(); // ----> OverlappingFileLockException
 		}
-		 
+
 		catch (Exception ex1) {
 			ex1.printStackTrace();
 			fail(ex1.getMessage());
@@ -131,6 +131,5 @@ public class TestLockUpdateClose extends TestCase {
 		}
 
 	}
-
 
 }

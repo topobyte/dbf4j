@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,55 +30,57 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.File;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.DBFTypes;
 import org.xBaseJ.fields.CharField;
 import org.xBaseJ.fields.MemoField;
 
-public class TestFoxPro extends TestCase {
+import junit.framework.TestCase;
 
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(TestFoxPro.class);
-    }
+public class TestFoxPro extends TestCase
+{
 
-
-//public void testStart()
-//{ i lost the copy of memofile.dbf
-//    try{
-//        DBF fp = new DBF("testfiles/memofile.dbf");
-//        System.out.println(fp.getVersion());
-//       }
-//    catch (Exception e)
-//    {
-//       fail(e.getMessage());
-//    }
-//}
-public void testCreateAll() {
-	try {
-		
-		DBF fp = new DBF("testfiles/foxprotest.dbf", DBFTypes.FOXPRO_WITH_MEMO, true);
-		fp.addField(new CharField("name", 10));
-		fp.addField(new MemoField("memo"));
-		fp.close();
-		File f = new File("testfiles/foxprotest.dbf");
-		if (f.exists() == false)
-			fail("can't find foxpro dbf file");
-		f = new File("testfiles/foxprotest.fpt");
-		if (f.exists() == false)
-			fail("can't find foxpro fpt file");
-			
+	public static void main(String[] args)
+	{
+		junit.textui.TestRunner.run(TestFoxPro.class);
 	}
-	catch (Exception e) {
-		e.printStackTrace();
-		fail(e.getMessage());
-	} 
-	
-}
 
+	// public void testStart()
+	// { i lost the copy of memofile.dbf
+	// try{
+	// DBF fp = new DBF("testfiles/memofile.dbf");
+	// System.out.println(fp.getVersion());
+	// }
+	// catch (Exception e)
+	// {
+	// fail(e.getMessage());
+	// }
+	// }
+	public void testCreateAll()
+	{
+		try {
+
+			DBF fp = new DBF("testfiles/foxprotest.dbf",
+					DBFTypes.FOXPRO_WITH_MEMO, true);
+			fp.addField(new CharField("name", 10));
+			fp.addField(new MemoField("memo"));
+			fp.close();
+			File f = new File("testfiles/foxprotest.dbf");
+			if (f.exists() == false) {
+				fail("can't find foxpro dbf file");
+			}
+			f = new File("testfiles/foxprotest.fpt");
+			if (f.exists() == false) {
+				fail("can't find foxpro fpt file");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+
+	}
 
 }

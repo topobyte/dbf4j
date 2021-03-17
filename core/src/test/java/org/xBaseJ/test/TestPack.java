@@ -1,4 +1,12 @@
 package org.xBaseJ.test;
+
+import org.xBaseJ.DBF;
+import org.xBaseJ.fields.CharField;
+import org.xBaseJ.fields.Field;
+import org.xBaseJ.fields.LogicalField;
+import org.xBaseJ.fields.MemoField;
+import org.xBaseJ.fields.NumField;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,42 +37,35 @@ package org.xBaseJ.test;
  *
 */
 
-
 import junit.framework.TestCase;
-
-import org.xBaseJ.DBF;
-import org.xBaseJ.fields.CharField;
-import org.xBaseJ.fields.Field;
-import org.xBaseJ.fields.LogicalField;
-import org.xBaseJ.fields.MemoField;
-import org.xBaseJ.fields.NumField;
 
 /**
  * test packing logic
+ * 
  * @author joseph mcverry
  *
  */
-public class TestPack extends TestCase {
+public class TestPack extends TestCase
+{
 
 	public void build(boolean update)
 	{
-		try{
-			//Create a new dbf file
-			DBF aDB=new DBF("testfiles/class.dbf",true);
+		try {
+			// Create a new dbf file
+			DBF aDB = new DBF("testfiles/class.dbf", true);
 
-			//Create the fields
+			// Create the fields
 
-			CharField classId = new CharField("classId",9);
-			CharField className = new CharField("className",25);
-			CharField teacherId = new CharField("teacherId",9);
-			CharField daysMeet = new CharField("daysMeet",7);
-			CharField timeMeet =new CharField("timeMeet",4);
-			NumField credits = new NumField("credits",2, 0);
+			CharField classId = new CharField("classId", 9);
+			CharField className = new CharField("className", 25);
+			CharField teacherId = new CharField("teacherId", 9);
+			CharField daysMeet = new CharField("daysMeet", 7);
+			CharField timeMeet = new CharField("timeMeet", 4);
+			NumField credits = new NumField("credits", 2, 0);
 			LogicalField UnderGrad = new LogicalField("UnderGrad");
 			MemoField discuss = new MemoField("discuss");
 
-
-			//Add field definitions to database
+			// Add field definitions to database
 			aDB.addField(classId);
 			aDB.addField(className);
 			aDB.addField(teacherId);
@@ -74,9 +75,17 @@ public class TestPack extends TestCase {
 			aDB.addField(UnderGrad);
 			aDB.addField(discuss);
 
-			aDB.createIndex("testfiles/classId.ndx","classId",true,true);     //  true - delete ndx, true - unique index,
-			aDB.createIndex("testfiles/TchrClass.ndx","teacherID+classId", true, false);     //true - delete NDX,  false - unique index,
-			//System.out.println("index created");
+			aDB.createIndex("testfiles/classId.ndx", "classId", true, true); // true
+																				// -
+																				// delete
+																				// ndx,
+																				// true
+																				// -
+																				// unique
+																				// index,
+			aDB.createIndex("testfiles/TchrClass.ndx", "teacherID+classId",
+					true, false); // true - delete NDX, false - unique index,
+			// System.out.println("index created");
 
 			classId.put("JAVA10100");
 			className.put("Introduction to JAVA");
@@ -111,9 +120,9 @@ public class TestPack extends TestCase {
 
 			aDB.write();
 
-			if (update == false)
+			if (update == false) {
 				aDB.delete();
-
+			}
 
 			classId.put("JAVA501");
 			className.put("JAVA And Abstract Algebra");
@@ -125,7 +134,7 @@ public class TestPack extends TestCase {
 			discuss.put("weird class");
 
 			aDB.write();
-			
+
 			if (update == true) {
 				aDB.gotoRecord(3);
 				aDB.delete();
@@ -133,11 +142,9 @@ public class TestPack extends TestCase {
 			}
 
 			aDB.close();
-			
+
 			aDB = null;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getLocalizedMessage());
 		}
@@ -147,74 +154,72 @@ public class TestPack extends TestCase {
 	{
 		build(false);
 		try {
-		DBF dbf = new DBF("testfiles/class.dbf");
+			DBF dbf = new DBF("testfiles/class.dbf");
 
-		assertEquals(4, dbf.getRecordCount());
+			assertEquals(4, dbf.getRecordCount());
 
-		dbf.pack();
+			dbf.pack();
 
-		assertEquals(3, dbf.getRecordCount());
+			assertEquals(3, dbf.getRecordCount());
 
-		for (int i = 1; i < 4; i++)
-		{
-			dbf.gotoRecord(i);
-			String bean = dbf.getField(1).get();
-			if (i == 1)
-				assertEquals("JAVA10100", bean);
-			else if (i == 2)
-				assertEquals("JAVA10200", bean);
-			else
-				assertEquals("JAVA501", bean);
-		}
+			for (int i = 1; i < 4; i++) {
+				dbf.gotoRecord(i);
+				String bean = dbf.getField(1).get();
+				if (i == 1) {
+					assertEquals("JAVA10100", bean);
+				} else if (i == 2) {
+					assertEquals("JAVA10200", bean);
+				} else {
+					assertEquals("JAVA501", bean);
+				}
+			}
 
-		dbf.close();
-		dbf = null;
+			dbf.close();
+			dbf = null;
 
-
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 	}
+
 	public void testPackAfterUpdate()
 	{
 		build(true);
 		try {
-		DBF dbf = new DBF("testfiles/class.dbf");
+			DBF dbf = new DBF("testfiles/class.dbf");
 
-		assertEquals(4, dbf.getRecordCount());
+			assertEquals(4, dbf.getRecordCount());
 
-		dbf.pack();
+			dbf.pack();
 
-		assertEquals(3, dbf.getRecordCount());
+			assertEquals(3, dbf.getRecordCount());
 
-		for (int i = 1; i < 4; i++)
-		{
-			dbf.gotoRecord(i);
-			String bean = dbf.getField(1).get();
-			if (i == 1)
-				assertEquals("JAVA10100", bean);
-			else if (i == 2)
-				assertEquals("JAVA10200", bean);
-			else
-				assertEquals("JAVA501", bean);
-		}
+			for (int i = 1; i < 4; i++) {
+				dbf.gotoRecord(i);
+				String bean = dbf.getField(1).get();
+				if (i == 1) {
+					assertEquals("JAVA10100", bean);
+				} else if (i == 2) {
+					assertEquals("JAVA10200", bean);
+				} else {
+					assertEquals("JAVA501", bean);
+				}
+			}
 
-		dbf.close();
-		dbf = null;
+			dbf.close();
+			dbf = null;
 
-
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 	}
 
-	public void testPackwithFPT() {
+	public void testPackwithFPT()
+	{
 		try {
 			DBF dbf = new DBF("testfiles/crw.DBF");
 
@@ -224,66 +229,60 @@ public class TestPack extends TestCase {
 
 			assertEquals(dbf.getRecordCount(), recCnt);
 
-
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				fail(e.getMessage());
-			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 
 	}
-	
+
 	/*
-	 * If you delete every
-record in a DBF, then call pack followed by a reindex, then attempt to
-re-add a record which contains a prior unique key value, you will fail with
-a duplicate key error. It appears the index doesn't get initialized when
-reindex knows there are zero records on file.
+	 * If you delete every record in a DBF, then call pack followed by a
+	 * reindex, then attempt to re-add a record which contains a prior unique
+	 * key value, you will fail with a duplicate key error. It appears the index
+	 * doesn't get initialized when reindex knows there are zero records on
+	 * file.
 	 */
 	public void testBugDeleteAllPackReindexReadd()
 	{
 		build(true);
-	try {
-		DBF aDB = new DBF("testfiles/class.DBF");
-		aDB.useIndex("testfiles/classId.ndx");
-		aDB.useIndex("testfiles/TchrClass.ndx");
-		
-	
-		for (int i = 0; i < aDB.getRecordCount(); i++) {
-			aDB.gotoRecord(i+1);
-			aDB.delete();
+		try {
+			DBF aDB = new DBF("testfiles/class.DBF");
+			aDB.useIndex("testfiles/classId.ndx");
+			aDB.useIndex("testfiles/TchrClass.ndx");
+
+			for (int i = 0; i < aDB.getRecordCount(); i++) {
+				aDB.gotoRecord(i + 1);
+				aDB.delete();
+			}
+			aDB.pack();
+			aDB.getIndex(1).reIndex();
+			aDB.getIndex(2).reIndex();
+			Field classId = aDB.getField("classId");
+			Field className = aDB.getField("className");
+			Field teacherId = aDB.getField("teacherId");
+			Field daysMeet = aDB.getField("daysMeet");
+			Field timeMeet = aDB.getField("timeMeet");
+			// Field credits = aDB.getField("credits");
+			// Field UnderGrad = aDB.getField("UnderGrad");
+			Field discuss = aDB.getField("discuss");
+
+			classId.put("JAVA10100");
+			className.put("Introduction to JAVA");
+			teacherId.put("120120120");
+			daysMeet.put("NYNYNYN");
+			timeMeet.put("0800");
+			discuss.put("Intro class");
+
+			aDB.write();
+			aDB = null;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getLocalizedMessage());
+
 		}
-		aDB.pack();
-		aDB.getIndex(1).reIndex();
-		aDB.getIndex(2).reIndex();
-		Field classId = aDB.getField("classId");
-		Field className = aDB.getField("className");
-		Field teacherId = aDB.getField("teacherId");
-		Field daysMeet = aDB.getField("daysMeet");
-		Field timeMeet =aDB.getField("timeMeet");
-		//Field credits = aDB.getField("credits");
-		//Field UnderGrad = aDB.getField("UnderGrad");
-		Field discuss = aDB.getField("discuss");
-		
-		classId.put("JAVA10100");
-		className.put("Introduction to JAVA");
-		teacherId.put("120120120");
-		daysMeet.put("NYNYNYN");
-		timeMeet.put("0800");
-		discuss.put("Intro class");
-
-		aDB.write();
-		aDB = null;
-		
-	}
-	catch (Exception e)
-	{
-		e.printStackTrace();
-		fail(e.getLocalizedMessage());
-		
-	}
 
 	}
-  
 
 }

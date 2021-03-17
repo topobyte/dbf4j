@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,11 +30,8 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.File;
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.DBFTypes;
@@ -41,9 +39,12 @@ import org.xBaseJ.Util;
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.CharField;
 
-public class MissingMDX extends TestCase {
+import junit.framework.TestCase;
 
-	public void testMissingMDX() throws  xBaseJException, IOException
+public class MissingMDX extends TestCase
+{
+
+	public void testMissingMDX() throws xBaseJException, IOException
 	{
 		Util.setxBaseJProperty("ignoreMissingMDX", "");
 		assertEquals(Util.getxBaseJProperty("ignoreMissingMDX"), "");
@@ -52,7 +53,7 @@ public class MissingMDX extends TestCase {
 		f.delete();
 		f = new File("testFiles/test.mdx");
 		f.delete();
-		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true );
+		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true);
 		d.addField(new CharField("one", 10));
 		d.close();
 		f = new File("testfiles/test.mdx");
@@ -68,13 +69,14 @@ public class MissingMDX extends TestCase {
 		}
 	}
 
-	public void testSetPropertyMissingMDXTrue() throws  xBaseJException, IOException
+	public void testSetPropertyMissingMDXTrue()
+			throws xBaseJException, IOException
 	{
 		File f = new File("testfiles/test.dbf");
 		f.delete();
 		f = new File("testfiles/test.mdx");
 		f.delete();
-		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true );
+		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true);
 		d.addField(new CharField("one", 10));
 		d.close();
 		f = new File("testfiles/test.mdx");
@@ -91,13 +93,15 @@ public class MissingMDX extends TestCase {
 			e.printStackTrace();
 		}
 	}
-	public void testSetPropertyMissingMDXFalse() throws  xBaseJException, IOException
+
+	public void testSetPropertyMissingMDXFalse()
+			throws xBaseJException, IOException
 	{
 		File f = new File("testfiles/test.dbf");
 		f.delete();
 		f = new File("testfiles/test.mdx");
 		f.delete();
-		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true );
+		DBF d = new DBF("testfiles/test.dbf", DBFTypes.DBASEIV, true);
 		d.addField(new CharField("one", 10));
 		d.close();
 		f = new File("testfiles/test.mdx");

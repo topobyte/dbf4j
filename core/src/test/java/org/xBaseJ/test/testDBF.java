@@ -1,4 +1,5 @@
 package org.xBaseJ.test;
+
 /**
  * xBaseJ - Java access to dBase files
  *<p>Copyright 1997-2014 - American Coders, LTD  - Raleigh NC USA
@@ -29,20 +30,20 @@ package org.xBaseJ.test;
  *
 */
 
-
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.xBaseJ.DBF;
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.CharField;
 import org.xBaseJ.fields.MemoField;
 
+import junit.framework.TestCase;
 
-public class testDBF extends TestCase {
+public class testDBF extends TestCase
+{
 
-	public void testBuildDBF() {
+	public void testBuildDBF()
+	{
 		DBF aDB = null;
 		try {
 			aDB = new DBF("testfiles/testdbt.dbf", true);

@@ -1,3 +1,7 @@
+wrapper {
+    gradleVersion = '5.2.1'
+}
+
 group = pGroup
 version = pVersion
 

@@ -20,6 +20,18 @@ there seems to be no development since at least ~2014.
 This library is released under the terms of the GNU Lesser General Public
 License.
 
+## Library
+
+We provide access to the artifacts via our own Maven repository:
+
+<https://mvn.topobyte.de>
+
+The package is available at these coordinates:
+
+<pre>
+<a href="https://mvn.topobyte.de/de/topobyte/dbf4j/0.1.0/">de.topobyte:dbf4j:0.1.0</a>
+</pre>
+
 ## Test data
 
 Testing of this library is not very mature at the moment. As a first step
